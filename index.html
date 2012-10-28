@@ -1,0 +1,417 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>WebGL Demo</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+<script type="text/javascript" src="webgl-utils.js"></script>
+
+<script id="vertex-vs" type="x-shader/x-vertex">
+  /* OpenGL ES's shading language - Vertex shader
+  */
+  /* Mohu si volne definovat promene, ktere plnim daty (vertexy/barvy/textury...)
+  
+     Typy:
+       attribute - plnene "zvenku" - vetsinou z pole
+       uniform   - konstanty
+       varying   - "generovane" promene - automaticky se interpoluji mezi 
+                   vertexy
+                   
+     Jmeno promene nesmi zacinat na gl_ - tyto promene jsou vyhrazene
+     pro WebGL a maji specialni vyznam, napr:
+     
+     gl_Position   - vysledna poloha vertexu (2D (x,y) + "hloubka" pro Z-buffer (Z) + vaha (W))
+  */
+  
+  // Me promene s pozici vertextu a koordinatama textur
+  attribute vec3 aVertexPosition;
+  attribute vec2 aTextureCoord;
+  
+  // Me matice (View a Projection)
+  uniform mat4 uMVMatrix;
+  uniform mat4 uPMatrix;
+  
+  // varying - prenasi se do pixel shaderu interpolaci mezi vertexy
+  varying vec2 vTextureCoord;
+      
+  void main(void) {
+    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+    vTextureCoord = aTextureCoord;
+  }
+</script>
+
+<script id="pixel-ps" type="x-shader/x-fragment">
+  /* OpenGL ES's shading language - Pixel (Fragment) shader
+  */
+  precision mediump float;
+  
+  // varying - interpolovana hodnota z vertex shaderu
+  varying vec2 vTextureCoord;
+  
+  // konstanta - zde pro pouzitou texturu
+  uniform sampler2D uTexture;
+  
+  void main(void) {
+      gl_FragColor = texture2D(uTexture, vec2(vTextureCoord.s, vTextureCoord.t));
+  }
+</script>
+
+<script>
+  // Globalni WebGL objekt
+  var gl;
+  
+  // Muj globalni objekt pro graficke data
+  var graph = new Object();
+
+  // Moje WebGL matice
+  graph.worldMatrix = mat4.create();
+  graph.cameraMatrix = mat4.create();  
+  
+  // Vysledne transformacni matice pro WebGL
+  graph.modelViewMatrix = mat4.create();  
+  graph.projectionMatrix = mat4.create();
+  
+  // Konfigurace polarnich souradnic kamery
+  graph.camera = new Object();
+  graph.camera.position = [0.0, 0.0, 0.0];
+  graph.camera.rotation = 0.0;
+  graph.camera.elevation = Math.PI/4; // 45 stupnu
+  graph.camera.distance = -10.0;
+  graph.camera.changed = 1;
+
+
+  /* Zkompiluje DOM element script s programem shaderu 
+     a vrati jako shader objekt WebGLShader
+  */
+  function getShader(gl, id) {
+      var shaderScript = document.getElementById(id);
+      if (!shaderScript) {
+          return null;
+      }
+
+      /* Sestavi program shaderu z DOM elementu script do jednoho retezce
+      */
+      var str = "";
+      var k = shaderScript.firstChild;
+      while (k) {
+          if (k.nodeType == 3) {
+              str += k.textContent;
+          }
+          k = k.nextSibling;
+      }
+
+      var shader;
+      if (shaderScript.type == "x-shader/x-fragment") {
+          shader = gl.createShader(gl.FRAGMENT_SHADER);
+      } else if (shaderScript.type == "x-shader/x-vertex") {
+          shader = gl.createShader(gl.VERTEX_SHADER);
+      } else {
+          return null;
+      }
+
+      gl.shaderSource(shader, str);
+      gl.compileShader(shader);
+
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          alert(gl.getShaderInfoLog(shader));
+          return null;
+      }
+
+      return shader;
+  }
+
+  /* Vytvori WebGLProgram objekt (potrebuje jak vertex tak pixel shader)
+  */ 
+  function createWebGLProgram() {
+      var fragmentShader = getShader(gl, "pixel-ps");
+      var vertexShader = getShader(gl, "vertex-vs");
+
+      program = gl.createProgram();
+      gl.attachShader(program, vertexShader);
+      gl.attachShader(program, fragmentShader);
+      gl.linkProgram(program);
+
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+          alert("Could not initialise shaders");
+      }      
+
+      gl.useProgram(program);
+      
+      // Vraci index promene aVertexPosition (soucast naseho vertex shaderu)
+      program.vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition");
+      // Nastavime aVertexPosition ke spracovani jako pole
+      gl.enableVertexAttribArray(program.vertexPositionAttribute);
+
+      // Podobne pro aTextureCoord - nastavime jako pole "vertexu"
+      program.textureCoordAttribute = gl.getAttribLocation(program, "aTextureCoord");
+      gl.enableVertexAttribArray(program.textureCoordAttribute);
+
+      // Nacti indexy pro matice
+      program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix");
+      program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
+      
+      // Nacti index me promene s texturou
+      program.samplerUniform = gl.getUniformLocation(program, "uTexture");
+      
+      return program;
+  }
+
+  function graphicsInit() {  
+      var canvas = document.getElementById("webgl-canvas");      
+      try {
+        gl = canvas.getContext("experimental-webgl");              
+      } catch (e) {}      
+      if (!gl) {
+        alert("Sorry kamo, ale chce to jinej prohlizec!");
+      }
+      
+      // Zakladni WebGL konfigurace
+      gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      gl.enable(gl.DEPTH_TEST);
+      
+      // Nastav projekcni matici
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      mat4.perspective(45, canvas.width / canvas.height, 0.1, 100.0, graph.projectionMatrix);
+      
+      // Zkompiluj shader program
+      graph.shaderProgram = createWebGLProgram();  
+  }
+
+  function handleLoadedTexture(textures) {
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+      gl.bindTexture(gl.TEXTURE_2D, textures[0]);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textures[0].image);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+
+      gl.bindTexture(gl.TEXTURE_2D, textures[1]);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textures[1].image);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+
+      gl.bindTexture(gl.TEXTURE_2D, textures[2]);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textures[2].image);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+      gl.generateMipmap(gl.TEXTURE_2D);
+
+      gl.bindTexture(gl.TEXTURE_2D, null);
+  }
+
+  var crateTextures = Array();
+
+  function initTexture() {
+  /*
+      var crateImage = new Image();
+
+      for (var i=0; i < 3; i++) {
+          var texture = gl.createTexture();
+          texture.image = crateImage;
+          crateTextures.push(texture);
+      }
+
+      crateImage.onload = function () {
+          handleLoadedTexture(crateTextures)
+      }
+      crateImage.src = "crate.gif";
+*/      
+  }
+    
+
+  var cubeVertexPositionBuffer;
+  var cubeVertexTextureCoordBuffer;
+  var cubeVertexIndexBuffer;
+  function initBuffers() {
+      cubeVertexPositionBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
+      vertices = [
+          // Front face
+          -1.0, -1.0,  1.0,
+           1.0, -1.0,  1.0,
+           1.0,  1.0,  1.0,
+          -1.0,  1.0,  1.0,
+
+          // Back face
+          -1.0, -1.0, -1.0,
+          -1.0,  1.0, -1.0,
+           1.0,  1.0, -1.0,
+           1.0, -1.0, -1.0,
+
+          // Top face
+          -1.0,  1.0, -1.0,
+          -1.0,  1.0,  1.0,
+           1.0,  1.0,  1.0,
+           1.0,  1.0, -1.0,
+
+          // Bottom face
+          -1.0, -1.0, -1.0,
+           1.0, -1.0, -1.0,
+           1.0, -1.0,  1.0,
+          -1.0, -1.0,  1.0,
+
+          // Right face
+           1.0, -1.0, -1.0,
+           1.0,  1.0, -1.0,
+           1.0,  1.0,  1.0,
+           1.0, -1.0,  1.0,
+
+          // Left face
+          -1.0, -1.0, -1.0,
+          -1.0, -1.0,  1.0,
+          -1.0,  1.0,  1.0,
+          -1.0,  1.0, -1.0,
+      ];
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+      cubeVertexPositionBuffer.itemSize = 3;
+      cubeVertexPositionBuffer.numItems = 24;
+
+      cubeVertexTextureCoordBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
+      var textureCoords = [
+          // Front face
+          0.0, 0.0,
+          1.0, 0.0,
+          1.0, 1.0,
+          0.0, 1.0,
+
+          // Back face
+          1.0, 0.0,
+          1.0, 1.0,
+          0.0, 1.0,
+          0.0, 0.0,
+
+          // Top face
+          0.0, 1.0,
+          0.0, 0.0,
+          1.0, 0.0,
+          1.0, 1.0,
+
+          // Bottom face
+          1.0, 1.0,
+          0.0, 1.0,
+          0.0, 0.0,
+          1.0, 0.0,
+
+          // Right face
+          1.0, 0.0,
+          1.0, 1.0,
+          0.0, 1.0,
+          0.0, 0.0,
+
+          // Left face
+          0.0, 0.0,
+          1.0, 0.0,
+          1.0, 1.0,
+          0.0, 1.0,
+      ];
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
+      cubeVertexTextureCoordBuffer.itemSize = 2;
+      cubeVertexTextureCoordBuffer.numItems = 24;
+
+      cubeVertexIndexBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
+      var cubeVertexIndices = [
+          0, 1, 2,      0, 2, 3,    // Front face
+          4, 5, 6,      4, 6, 7,    // Back face
+          8, 9, 10,     8, 10, 11,  // Top face
+          12, 13, 14,   12, 14, 15, // Bottom face
+          16, 17, 18,   16, 18, 19, // Right face
+          20, 21, 22,   20, 22, 23  // Left face
+      ]
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+      cubeVertexIndexBuffer.itemSize = 1;
+      cubeVertexIndexBuffer.numItems = 36;
+  }
+
+  // Sestavi matici kamery z polarnich souradnic
+  function cameraSet(position, rotation, elevation, distance) {
+    var camera = mat4.create();
+    
+    mat4.identity(camera);
+    mat4.translate(camera, position);
+    mat4.rotateY(camera, rotation);
+    mat4.rotateX(camera, elevation);
+    mat4.translate(camera, [0.0, 0.0, -distance]);
+  
+    return mat4.inverse(camera);
+  }
+
+  // Spocita vyslednou modelView matici (World*camera_inver
+  function modelViewMatrixSet() {
+    mat4.multiply(graph.worldMatrix, graph.cameraMatrix, graph.modelViewMatrix);
+  }  
+
+  // Nastavi tranformacni matice pro shader
+  function setMatrixUniforms() {
+      gl.uniformMatrix4fv(graph.shaderProgram.pMatrixUniform, false, graph.projectionMatrix);
+      gl.uniformMatrix4fv(graph.shaderProgram.mvMatrixUniform, false, graph.modelViewMatrix);
+  }
+  
+  function drawObject() {
+      gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
+      gl.vertexAttribPointer(graph.shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+      gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
+      gl.vertexAttribPointer(graph.shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+      //gl.activeTexture(gl.TEXTURE0);
+      //gl.bindTexture(gl.TEXTURE_2D, 0);
+      gl.uniform1i(graph.shaderProgram.samplerUniform, 0);
+
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
+            
+      mat4.identity(graph.worldMatrix);
+      mat4.translate(graph.worldMatrix, [0,0,0]);
+      
+      modelViewMatrixSet();
+      setMatrixUniforms();
+      gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+  }
+  
+  function drawScene() {
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+      if(graph.camera.changed) {
+        graph.cameraMatrix = cameraSet(graph.camera.position, 
+                                       graph.camera.rotation, 
+                                       graph.camera.elevation, 
+                                       graph.camera.distance);
+        graph.camera.changed = 0;
+      }
+
+      drawObject();
+  }
+
+  // Kresli scenu (hlavni smycka)
+  function animationFrame() {
+  
+      // zaregistruj animationFrame pro dalsi frame
+      requestAnimFrame(animationFrame);
+      
+      // Kresli scenu & spol.
+      drawScene();
+  }
+
+  // Start!
+  function DemoStart() {
+      graphicsInit();
+      
+      initBuffers();
+      initTexture();
+
+/*
+      document.onkeydown = handleKeyDown;
+      document.onkeyup = handleKeyUp;
+*/
+      animationFrame();
+  }
+
+</script>
+
+<body onload="DemoStart();">
+    <canvas id="webgl-canvas" onmousewheel="handleWheel();" width="800" height="600">
+    </canvas>
+</body>
+</html>
