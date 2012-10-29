@@ -61,11 +61,12 @@
   // Globalni WebGL objekt
   var gl;
   
-  // Muj globalni objekt pro graficke data
+  // Globalni objekt pro graficke data
   var graph = new Object();
 
   // Moje WebGL matice
   graph.worldMatrix = mat4.create();
+  mat4.identity(graph.worldMatrix);  
   graph.cameraMatrix = mat4.create();  
   
   // Vysledne transformacni matice pro WebGL
@@ -76,10 +77,26 @@
   graph.camera = new Object();
   graph.camera.position = [0.0, 0.0, 0.0];
   graph.camera.rotation = 0.0;
-  graph.camera.elevation = Math.PI/4; // 45 stupnu
+  graph.camera.elevation = Math.PI/3; // 45 stupnu
   graph.camera.distance = -10.0;
   graph.camera.changed = 1;
 
+  // Muj globalni objekt se vsupem z klavesnice/mysi
+  const button_first = 0;
+  const button_middle = 1;
+  const button_second = 2;
+  const button_wheel_up = 4;
+  const button_wheel_down = 5;
+  
+  var control = new Object();
+  control.keys = {}; // pole stisknutych klaves
+  control.mouse = new Object(); // Stav mysi
+  control.mouse.mx = 0;
+  control.mouse.my = 0;
+  control.mouse.last_mx = 0;
+  control.mouse.last_my = 0;
+  control.mouse.buttons = {};  
+  
 
   /* Zkompiluje DOM element script s programem shaderu 
      a vrati jako shader objekt WebGLShader
@@ -158,7 +175,7 @@
   }
 
   function graphicsInit() {  
-      var canvas = document.getElementById("webgl-canvas");      
+      var canvas = document.getElementById("webgl-canvas");
       try {
         gl = canvas.getContext("experimental-webgl");              
       } catch (e) {}      
@@ -202,8 +219,7 @@
 
   var crateTextures = Array();
 
-  function initTexture() {
-  /*
+  function initTexture() {  
       var crateImage = new Image();
 
       for (var i=0; i < 3; i++) {
@@ -215,8 +231,7 @@
       crateImage.onload = function () {
           handleLoadedTexture(crateTextures)
       }
-      crateImage.src = "crate.gif";
-*/      
+      crateImage.src = "test.jpg";
   }
     
 
@@ -345,67 +360,144 @@
 
   // Nastavi tranformacni matice pro shader
   function setMatrixUniforms() {
-      gl.uniformMatrix4fv(graph.shaderProgram.pMatrixUniform, false, graph.projectionMatrix);
-      gl.uniformMatrix4fv(graph.shaderProgram.mvMatrixUniform, false, graph.modelViewMatrix);
+    gl.uniformMatrix4fv(graph.shaderProgram.pMatrixUniform, false, graph.projectionMatrix);
+    gl.uniformMatrix4fv(graph.shaderProgram.mvMatrixUniform, false, graph.modelViewMatrix);
   }
   
   function drawObject() {
-      gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
-      gl.vertexAttribPointer(graph.shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
+    gl.vertexAttribPointer(graph.shaderProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-      gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
-      gl.vertexAttribPointer(graph.shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(graph.shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-      //gl.activeTexture(gl.TEXTURE0);
-      //gl.bindTexture(gl.TEXTURE_2D, 0);
-      gl.uniform1i(graph.shaderProgram.samplerUniform, 0);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, crateTextures[0]);
+    gl.uniform1i(graph.shaderProgram.samplerUniform, 0);
 
-      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
-            
-      mat4.identity(graph.worldMatrix);
-      mat4.translate(graph.worldMatrix, [0,0,0]);
-      
-      modelViewMatrixSet();
-      setMatrixUniforms();
-      gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
+              
+    mat4.translate(graph.worldMatrix, [0,0,0]);
+    
+    modelViewMatrixSet();
+    setMatrixUniforms();
+    gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
   }
   
   function drawScene() {
-      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-      if(graph.camera.changed) {
-        graph.cameraMatrix = cameraSet(graph.camera.position, 
-                                       graph.camera.rotation, 
-                                       graph.camera.elevation, 
-                                       graph.camera.distance);
-        graph.camera.changed = 0;
-      }
+    if(graph.camera.changed) {
+      graph.cameraMatrix = cameraSet(graph.camera.position, 
+                                     graph.camera.rotation,
+                                     graph.camera.elevation,
+                                     graph.camera.distance);
+      graph.camera.changed = 0;
+    }
 
-      drawObject();
+    drawObject();
+  }
+  
+  function handleCamera() {
+    // rotuj kameru
+    if(control.keys[KeyEvent.DOM_VK_CONTROL]) {        
+      graph.camera.rotation += Math.PI*0.002*control.mouse.dx;
+      graph.camera.elevation -= Math.PI*0.002*control.mouse.dy;
+      if(graph.camera.elevation < 0)
+        graph.camera.elevation = 0;
+      if(graph.camera.elevation > Math.PI/2)
+        graph.camera.elevation = Math.PI/2;
+      graph.camera.changed = 1;
+    }
+    
+    // posun kameru
+    if(control.keys[KeyEvent.DOM_VK_SHIFT]) {
+      
+    }
+    
+    // zoomuj kameru
+  }
+  
+  function calcMouse() {
+    control.mouse.dx = control.mouse.mx - control.mouse.last_mx;
+    control.mouse.dy = control.mouse.my - control.mouse.last_my;
+    
+    dump("\n*******************************************\n");
+    
+    dump("control.mouse.mx = " + control.mouse.mx + "\n");
+    dump("control.mouse.my = " + control.mouse.my + "\n");
+    
+    dump("control.mouse.last_mx = " + control.mouse.last_mx + "\n");
+    dump("control.mouse.last_my = " + control.mouse.last_my + "\n");
+    
+    dump("control.mouse.dx = " + control.mouse.dx + "\n");
+    dump("control.mouse.dy = " + control.mouse.dy + "\n");
+    
+    control.mouse.last_mx = control.mouse.mx;
+    control.mouse.last_my = control.mouse.my;
+  }
+
+  function saveMouse() {
+    control.mouse.last_buttons = control.mouse.buttons;
   }
 
   // Kresli scenu (hlavni smycka)
   function animationFrame() {
-  
-      // zaregistruj animationFrame pro dalsi frame
-      requestAnimFrame(animationFrame);
-      
-      // Kresli scenu & spol.
-      drawScene();
+    // zaregistruj animationFrame pro dalsi frame
+    requestAnimFrame(animationFrame);
+
+    // dopocitej zmeny mysi
+    calcMouse();
+
+    // 
+    handleCamera();
+
+    // Kresli scenu & spol.
+    drawScene();    
+  }
+
+  // Klavesy jsou definovane jako KeyEvent.DOM_VK_* konstanty
+  function handleKeyDown(event) {
+    control.keys[event.keyCode] = true;
+  }
+  function handleKeyUp(event) {
+    control.keys[event.keyCode] = false;
+  }
+
+  // Vstup udalosti z mysi
+  // Dokumentace k event je na:
+  // https://developer.mozilla.org/en-US/docs/DOM/MouseEvent
+  // event.screenX, event.screenY - globalni souradnice
+  // event.clientX, event.clientY - lokalni souradnice (canvas)
+  // event.button  - Left button=0, middle button=1, right button=2.
+  // event.buttons - Left button=0, middle button=1 (if present), right button=2.
+  //                 Middle (wheel) button=4,5
+  function handleMouse(event) {    
+    control.mouse.mx = event.clientX;
+    control.mouse.my = event.clientY;
+    //control.mouse.buttons[event.buttons];
+  }
+
+  function inputInit() {
+    var canvas = document.getElementById("webgl-canvas");
+    
+    document.onkeydown = handleKeyDown;
+    document.onkeyup = handleKeyUp;    
+    
+    canvas.onmousedown = handleMouse;
+    document.onmouseup = handleMouse;
+    document.onmousemove = handleMouse;
   }
 
   // Start!
   function DemoStart() {
-      graphicsInit();
-      
-      initBuffers();
-      initTexture();
+    graphicsInit();
+    inputInit();
 
-/*
-      document.onkeydown = handleKeyDown;
-      document.onkeyup = handleKeyUp;
-*/
-      animationFrame();
+    initBuffers();
+    initTexture();
+
+    animationFrame();
   }
 
 </script>
