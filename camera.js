@@ -1,0 +1,69 @@
+/*
+ *        .þÛÛþ þ    þ þÛÛþ.     þ    þ þÛÛÛþ.  þÛÛÛþ .þÛÛþ. þ    þ
+ *       .þ   Û Ûþ.  Û Û   þ.    Û    Û Û    þ  Û.    Û.   Û Ûþ.  Û
+ *       Û    Û Û Û  Û Û    Û    Û   þ. Û.   Û  Û     Û    Û Û Û  Û
+ *     .þþÛÛÛÛþ Û  Û Û þÛÛÛÛþþ.  þþÛÛ.  þþÛÛþ.  þÛ    Û    Û Û  Û Û
+ *    .Û      Û Û  .þÛ Û      Û. Û   Û  Û    Û  Û.    þ.   Û Û  .þÛ
+ *    þ.      þ þ    þ þ      .þ þ   .þ þ    .þ þÛÛÛþ .þÛÛþ. þ    þ
+ *
+ * 
+ * Author: Martin Stransky <stransky@anakreon.cz>
+ *
+ * Vaguely based on WebGL tutorials (http://learningwebgl.com/)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ */
+
+// Sestavi matici kamery z polarnich souradnic
+function cameraSet(position, rotation, elevation, distance) {
+  var camera = mat4.create();
+  
+  mat4.identity(camera);
+  mat4.translate(camera, position);
+  mat4.rotateY(camera, rotation);
+  mat4.rotateX(camera, -elevation);
+  mat4.translate(camera, [0.0, 0.0, distance]);
+
+  return mat4.inverse(camera);
+}
+
+function handleCamera() {
+  // rotuj kameru
+  if(control.keys[KeyEvent.DOM_VK_CONTROL]) {
+    graph.camera.rotation -= Math.PI*0.002*control.mouse.dx;
+    graph.camera.elevation += Math.PI*0.002*control.mouse.dy;
+    if(graph.camera.elevation < 0)
+      graph.camera.elevation = 0;
+    if(graph.camera.elevation > Math.PI/2)
+      graph.camera.elevation = Math.PI/2;
+    graph.camera.changed = 1;
+  }
+  
+  // posun kameru
+  if(control.keys[KeyEvent.DOM_VK_SHIFT]) {
+    
+  }
+  
+  // zoom kamery
+  if(control.keys[KeyEvent.DOM_VK_EQUALS]) {
+    graph.camera.distance -= 0.5;
+    graph.camera.changed = 1;
+  }
+  if(control.keys[KeyEvent.DOM_VK_HYPHEN_MINUS]) {
+    graph.camera.distance += 0.5;
+    graph.camera.changed = 1;      
+  }
+}
