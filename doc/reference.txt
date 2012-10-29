@@ -1,0 +1,83 @@
+http://learningwebgl.com/blog/ - WebGl tutorialy (z Nehe)
+http://www.khronos.org/opengles/sdk/docs/reference_cards/OpenGL-ES-2_0-Reference-card.pdf - WebGL refenece card
+http://www.youtube.com/watch?v=huXucPChX3g - GDC 2012: Best practices in developing a web game 
+http://learningwebgl.com/cookbook/index.php/Main_Page - WebGl CookBook
+https://developer.mozilla.org/en-US/docs/WebGL/WebGL_best_practices - Hints
+http://www.khronos.org
+
+https://github.com/toji/gl-matrix
+
+http://browserquest.mozilla.org/ -> MMO
+http://play-ttd.com/play/
+
+http://www.khronos.org/registry/webgl/specs/latest/
+
+Otazky (Tricka):
+Co to je? (ES)
+Otazka do plena -> je webgl 3d? (za tricko)
+vec4(aVertexPosition, 1.0); -> proc toto?
+
+Proc web?
+- jede vsude, internet, multiplayer
+- porovnani s Flash
+
+- jak prepnout fo fullscreenu? (ale opravdoveho)
+
+Emscripten -> LLVM to JS, SDL to canvas
+https://github.com/kripken/emscripten/wiki -> Portovane hry do js
+
+https://github.com/cjcliffe/CubicVR.js/ - 3D engine?
+
+Slidy:
+- Co to je? (ES)
+- Otazka do plena -> je webgl 3d? (za tricko)
+
+- Inicializace - canavas?
+
+<html>
+<body>
+<canvas id="muj_canvas" style="border: none;" width="500" height="500">
+</canvas>
+</body>
+</html>
+
+// Nactu z DOM
+var canvas = document.getElementById("muj_canvas");
+gfx = canvas.getContext("2d"); // objekt na 2D kresleni
+gl = canvas.getContext("experimental-webgl"); // gl objekt
+
+2D animace -> casovac
+http://www.html5canvastutorials.com/advanced/html5-canvas-linear-motion-animation/
+
+// Rozdil oproti GL -> pouze vertex/fragment shaders 
+- dela se flip?
+
+// Loading textur
+
+
+Problemy (co se resi):
+- Cela aplikace je 1 html stranka - musime s tim pocitat
+  - AJAX - JSON data (loading)
+  - opakovani renderingu stranky
+    requestAnimationFrame() z Google Chrome utilities
+  - vstup od uzivatele (klavesnice/mys)
+  - casovace (ruzne druhy)
+
+Fullscreen API (ff9)
+  
+Problemy specificke pro js:
+  - techniky ktere umozni JIT
+  - vyhnout se konverzi na double, nepouzivat eval&spol. a podobne
+  
+Bezne techniky:
+jQuery - pro vstup klavesnice
+
+
+- da se ten canavas resizovat? (kdyz se me zmeni rozliseni obrazovky - fullscreen)
+
+- canvas 2D - jak se nahravaji obrazky, je tam "flip" cele obrazovky?
+
+Zakonceni prednasky:
+    - Co dal?
+    - bakalarky/diplomky
+    - Mozilla market place
