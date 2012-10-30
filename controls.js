@@ -35,13 +35,13 @@ const BUTTON_WHEEL_UP = 4;
 const BUTTON_WHEEL_DOWN = 5;
 
 var control = new Object();
-control.keys = {}; // pole stisknutych klaves
+control.keys = new Array(); // pole stisknutych klaves
 control.mouse = new Object(); // Stav mysi
 control.mouse.mx = 0;
 control.mouse.my = 0;
 control.mouse.last_mx = 0;
 control.mouse.last_my = 0;
-control.mouse.buttons = {};  
+control.mouse.buttons = new Array();
 
 
 function calcMouse() {

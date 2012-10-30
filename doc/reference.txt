@@ -68,16 +68,20 @@ Fullscreen API (ff9)
 Problemy specificke pro js:
   - techniky ktere umozni JIT
   - vyhnout se konverzi na double, nepouzivat eval&spol. a podobne
-  
+  - Float32Array[] - velmi rychle
+
 Bezne techniky:
-jQuery - pro vstup klavesnice
-
-
 - da se ten canavas resizovat? (kdyz se me zmeni rozliseni obrazovky - fullscreen)
 
 - canvas 2D - jak se nahravaji obrazky, je tam "flip" cele obrazovky?
+
+Debugovani - Firebug:
+console.log()
+Profiler
+Breakpointy
 
 Zakonceni prednasky:
     - Co dal?
     - bakalarky/diplomky
     - Mozilla market place
+

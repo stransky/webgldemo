@@ -41,66 +41,38 @@
  */
 
 /**
-* Callback called when texture has been loaded
-* Updates loading progress bar
+* Array of dynamic GeometryContainer
+* objects
 */
-function textureLoaded(){
+var dynamicObjects = [];
+/**         
+* Array of static GeometryContainer
+* objects
+*/  
+var staticObjects = [];
+var staticObjectsNum;
 
-    // Next texture
-    loadedTextureCount++;
-
-    // New progressbar value
-    var value = (loadedTextureCount / textureCount) * 100;
-    $("#progressbar").progressbar({
-
-        value: (loadedJSONValue + value)
-    });
-
-    // When fully loaded, hide progressbar
-    if(loadedTextureCount == textureCount){
-
-        $("#progressbar").stop().animate({'opacity':'0.0'}, 400);
-        $("#notification").animate({'opacity':'0.0'}, 400);
-
-        // Level loaded
-        loaded = true;
-
-        showTime = false;
-    }
-}
-
-/** 
-* Handles loaded texture...as expected :D
-* Creates texture buffers, sets filtering, ...
-* @param texture Texture object including texture image
+/**
+* Logic representation of game field
 */
-function handleLoadedTexture(texture) {
+var logic;
 
-    /**
-    * There is different coordination system in WebGL, so every
-    * texture has to be fliiped aroud Y axis.
-    * Point [0, 0] is top left corner of texture.
-    */
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+/**
+* Lights in the scene
+*/
+var lights = [];
+/**
+* Lightmaps in the scene
+*/
+var lightmaps = [];
+/**
+* Game materials
+*/
+var materials = [];
 
-    // You have to bind texture before working with it
-    gl.bindTexture(gl.TEXTURE_2D, texture);
+var textureCount = 0;
 
-    // Loading texture into GPU
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
-
-    // Magnify filtering - how texture acts when being upscaled
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); 
-
-    // How texture acts when being downscaled
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-
-    // Mipmap generation - diffent textures for different camera distance
-    gl.generateMipmap(gl.TEXTURE_2D);
-
-    // Unbind
-    gl.bindTexture(gl.TEXTURE_2D, null);
-}
+var useLightmaps = 0;
 
 /**
 * Handles JSON file
@@ -109,18 +81,16 @@ function handleLoadedTexture(texture) {
 */
 function handleLoadedJSON(inputJSON) {
 
-    if(log){
-        console.log("handling");
-    }
-
     var i;
     var j = 0;
     var textureCounter = 0;
-    var staticObjectsCounter = 0;
+    staticObjectsNum = 0;
     var materialsCounter;
 
     // Loading JSON file
-    for (structure in inputJSON) {
+    for (structure in inputJSON) {        
+
+        console.log("inputJSON[structure].type = " + inputJSON[structure].type + "\n");
 
         // Container
         if ((inputJSON[structure].type == "geometry_container" || 
@@ -132,7 +102,6 @@ function handleLoadedJSON(inputJSON) {
                 
                 // Using lightmaps
                 if(useLightmaps){
-
                     try{
                             var polyID = parseInt(inputJSON[structure].poly_id);
                             // Load lightmap
@@ -155,7 +124,7 @@ function handleLoadedJSON(inputJSON) {
 
                 // Create static item object
                 staticObjects[staticObjectsCounter] = new GeometryContainer(inputJSON[structure]);
-                staticObjectsCounter++;
+                staticObjectsNum++;
             }
         } 
         // Material
@@ -180,7 +149,7 @@ function handleLoadedJSON(inputJSON) {
     }
     
     var lightning = true;
-    gl.uniform1i(shaderProgram.useLightingUniform, lightning);
+    //gl.uniform1i(shaderProgram.useLightingUniform, lightning);
     
     // Create light
     var light = {
@@ -195,10 +164,12 @@ function handleLoadedJSON(inputJSON) {
     
     // Set lightning
     if (lightning) {
+/*
         gl.uniform3f(shaderProgram.ambientColorUniform, lights[0].diffuseColor[0], lights[0].diffuseColor[1], lights[0].diffuseColor[2]);
         gl.uniform3f(shaderProgram.pointLightingLocationUniform, lights[0].position[0], lights[0].position[1], lights[0].position[2]);
         gl.uniform3f(shaderProgram.pointLightingSpecularColorUniform, lights[0].diffuseColor[0], lights[0].diffuseColor[1], lights[0].diffuseColor[2]);
         gl.uniform3f(shaderProgram.pointLightingDiffuseColorUniform, lights[0].diffuseColor[0], lights[0].diffuseColor[1], lights[0].diffuseColor[2]);
+*/        
     }
 
     // Create selected bug texture
@@ -232,103 +203,24 @@ function handleLoadedJSON(inputJSON) {
     }
 
     materials[floorTexture.name] = new Material(floorTexture);
-    
-    // START DRAWING
-    tick();
-
-    // Start FPS showing
-    if(showFPSinConsole){
-        if(fpsTimeoutID != 0){
-            clearTimeout(fpsTimeoutID);
-        }
-        fpsTimeoutID = setTimeout(showFPS, 1000);  
-    }
-
-}
-
-
-/**
-* This function is called when JSON file loaded
-* Updates loading progress bar
-*/
-function jsonLoaded(){
-
-    if(log){
-        console.log('json loaded');
-    }
-
-    $("#progressbar").progressbar({
-        value: loadedJSONValue
-    });
-
-    $("#gameProgress").progressbar({
-        value: 0
-    });
-
-    resetUiInventory();  
-    //logicBackup = clone(logic);
-
-    draw = true;
-
 }
 
 /**
 * Loads level specified in selectedLevel variable
 */
-function loadLevel() {
+function loadScene(file) {
     
-    loaded = false;
-
-    // Loading notification
-    notificationAnimation('loading');
-    $("#progressbar").progressbar({value: 0}).stop().css({'opacity':'0.0'}).animate({'opacity':'1.0'}, 400);
-
     // Load level from server
     var request = new XMLHttpRequest();
-    request.open("GET", levelPath + selectedLevel + levelFileType);
+    request.open("GET", file);
     // Set handle
-    request.onreadystatechange = function() {
-        
-        if (request.readyState == 4) {
-            
-            // Load JSON file
-            handleLoadedJSON(JSON.parse(request.responseText));
-
-            // JSON loaded
-            jsonLoaded();
-
-            // Select Bug
-            logic.selectNextBug();
-
-            // Do correntions
-            corrections();
-
-        }
+    request.onreadystatechange = function() {        
+      if (request.readyState == 4) {            
+        // Load JSON file
+        handleLoadedJSON(JSON.parse(request.responseText));
+      }
     }
 
     // Make request
     request.send();
-}
-
-/**
-* Restart of level
-*/
-function reloadLogic() {
-
-    logic.selectNextBug();
-    loadLevel();
-}
-
-/**
-* Restarts game level
-*/
-function reloadLevel(){
-
-    draw = false;
-
-    logic = [];
-    dynamicObjects = [];
-    staticObjects = [];
-
-    loadLevel();  
 }

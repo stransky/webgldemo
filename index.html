@@ -57,8 +57,10 @@
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
 <script type="text/javascript" src="webgl-utils.js"></script>
 
-<script type="text/javascript" src="objects.js"></script>
 <script type="text/javascript" src="textures.js"></script>
+<script type="text/javascript" src="helpers.js"></script>
+<script type="text/javascript" src="logic.js"></script>
+<script type="text/javascript" src="objects.js"></script>
 <script type="text/javascript" src="loaders.js"></script>
 <script type="text/javascript" src="graphics.js"></script>
 <script type="text/javascript" src="controls.js"></script>
@@ -180,50 +182,6 @@
     gl.uniformMatrix4fv(graph.shaderProgram.pMatrixUniform, false, graph.projectionMatrix);
     gl.uniformMatrix4fv(graph.shaderProgram.mvMatrixUniform, false, graph.modelViewMatrix);
   }
-
-  var teapotVertexPositionBuffer;
-  var teapotVertexNormalBuffer;
-  var teapotVertexTextureCoordBuffer;
-  var teapotVertexIndexBuffer;
-
-  function handleLoadedTeapot(teapotData) {
-    teapotVertexNormalBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexNormalBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(teapotData.vertexNormals), gl.STATIC_DRAW);
-    teapotVertexNormalBuffer.itemSize = 3;
-    teapotVertexNormalBuffer.numItems = teapotData.vertexNormals.length / 3;
-
-    teapotVertexTextureCoordBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexTextureCoordBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(teapotData.vertexTextureCoords), gl.STATIC_DRAW);
-    teapotVertexTextureCoordBuffer.itemSize = 2;
-    teapotVertexTextureCoordBuffer.numItems = teapotData.vertexTextureCoords.length / 2;
-
-    teapotVertexPositionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, teapotVertexPositionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(teapotData.vertexPositions), gl.STATIC_DRAW);
-    teapotVertexPositionBuffer.itemSize = 3;
-    teapotVertexPositionBuffer.numItems = teapotData.vertexPositions.length / 3;
-
-    teapotVertexIndexBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, teapotVertexIndexBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(teapotData.indices), gl.STATIC_DRAW);
-    teapotVertexIndexBuffer.itemSize = 1;
-    teapotVertexIndexBuffer.numItems = teapotData.indices.length;
-
-    document.getElementById("loadingtext").textContent = "";
-  }
-
-  function loadScene() {
-    var request = new XMLHttpRequest();
-    request.open("GET", "test_level.json");
-    request.onreadystatechange = function () {
-      if (request.readyState == 4) {
-        handleLoadedTeapot(JSON.parse(request.responseText));
-      }
-    }
-    request.send();
-  }  
   
   function drawObject() {
     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
@@ -233,7 +191,7 @@
     gl.vertexAttribPointer(graph.shaderProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, crateTextures[2]);
+    gl.bindTexture(gl.TEXTURE_2D, globalTextures[0]);
     gl.uniform1i(graph.shaderProgram.samplerUniform, 0);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
@@ -291,9 +249,9 @@
     inputInit();
 
     initBuffers();
-    initTexture();
-    
-    loadScene();
+        
+    loadTexture("test.jpg", 0);
+    loadScene("test_level.json");
 
     animationFrame();
   }

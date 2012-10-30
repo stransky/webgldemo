@@ -191,11 +191,6 @@ function GeometryObject(containerObject, isItPoly) {
     */
     this.min = [0, 0, 0];
 
-    if(log){
-
-        console.log("Loading "+ this.name);
-    }
-
     /**
     * Creating envelope - getting maximal and
     * minimal values in all axis

@@ -27,41 +27,50 @@
  *
  */
 
-function handleLoadedTexture(textures) {
+/* List of global textures
+ */
+var globalTextures = Array();
+
+/** 
+* Handles loaded texture...as expected :D
+* Creates texture buffers, sets filtering, ...
+* @param texture Texture object including texture image
+*/
+function handleLoadedTexture(texture) {
+
+    /**
+    * There is different coordination system in WebGL, so every
+    * texture has to be fliiped aroud Y axis.
+    * Point [0, 0] is top left corner of texture.
+    */
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
-    gl.bindTexture(gl.TEXTURE_2D, textures[0]);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textures[0].image);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    // You have to bind texture before working with it
+    gl.bindTexture(gl.TEXTURE_2D, texture);
 
-    gl.bindTexture(gl.TEXTURE_2D, textures[1]);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textures[1].image);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    // Loading texture into GPU
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
 
-    gl.bindTexture(gl.TEXTURE_2D, textures[2]);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textures[2].image);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    // Magnify filtering - how texture acts when being upscaled
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); 
+
+    // How texture acts when being downscaled
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+
+    // Mipmap generation - diffent textures for different camera distance
     gl.generateMipmap(gl.TEXTURE_2D);
 
+    // Unbind
     gl.bindTexture(gl.TEXTURE_2D, null);
 }
 
-var crateTextures = Array();
-
-function initTexture() {  
-    var crateImage = new Image();
-
-    for (var i=0; i < 3; i++) {
-        var texture = gl.createTexture();
-        texture.image = crateImage;
-        crateTextures.push(texture);
+/* Load texture to given position
+ */
+function loadTexture(file, position) {
+    globalTextures[position] = gl.createTexture();
+    globalTextures[position].image = new Image();
+    globalTextures[position].image.onload = function () {
+        handleLoadedTexture(globalTextures[position])
     }
-
-    crateImage.onload = function () {
-        handleLoadedTexture(crateTextures)
-    }
-    crateImage.src = "test.jpg";
+    globalTextures[position].image.src = file;
 }
