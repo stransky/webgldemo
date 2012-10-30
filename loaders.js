@@ -45,6 +45,8 @@
 * objects
 */
 var dynamicObjects = [];
+var dynamicObjectsNum;
+
 /**         
 * Array of static GeometryContainer
 * objects
@@ -61,17 +63,17 @@ var logic;
 * Lights in the scene
 */
 var lights = [];
+var lightsNum;
+
 /**
 * Lightmaps in the scene
 */
 var lightmaps = [];
+
 /**
 * Game materials
 */
 var materials = [];
-
-var textureCount = 0;
-
 var useLightmaps = 0;
 
 /**
@@ -83,14 +85,12 @@ function handleLoadedJSON(inputJSON) {
 
     var i;
     var j = 0;
-    var textureCounter = 0;
     staticObjectsNum = 0;
-    var materialsCounter;
+    dynamicObjectsNum = 0;
+    lightsNum = 0;
 
     // Loading JSON file
-    for (structure in inputJSON) {        
-
-        console.log("inputJSON[structure].type = " + inputJSON[structure].type + "\n");
+    for (structure in inputJSON) {
 
         // Container
         if ((inputJSON[structure].type == "geometry_container" || 
@@ -118,12 +118,13 @@ function handleLoadedJSON(inputJSON) {
 
                 // Create dynamic item object
                 dynamicObjects[inputJSON[structure]["container_id"]] = new GeometryContainer(inputJSON[structure]);
+                dynamicObjectsNum++;
             } 
             // Static container
             else {
 
                 // Create static item object
-                staticObjects[staticObjectsCounter] = new GeometryContainer(inputJSON[structure]);
+                staticObjects[staticObjectsNum] = new GeometryContainer(inputJSON[structure]);
                 staticObjectsNum++;
             }
         } 
@@ -145,6 +146,7 @@ function handleLoadedJSON(inputJSON) {
 
             // Create light object
             lights.push(new Light(inputJSON[structure]));
+            lightsNum++;
         }
     }
     
@@ -203,6 +205,9 @@ function handleLoadedJSON(inputJSON) {
     }
 
     materials[floorTexture.name] = new Material(floorTexture);
+    
+    console.log("Loaded static objects = " + staticObjectsNum + "\n");
+    console.log("Loaded dynamic objects = " + dynamicObjectsNum + "\n");
 }
 
 /**

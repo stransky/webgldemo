@@ -141,8 +141,123 @@ function graphicsInit() {
     
     // Nastav projekcni matici
     gl.viewport(0, 0, canvas.width, canvas.height);
-    mat4.perspective(45, canvas.width / canvas.height, 0.1, 100.0, graph.projectionMatrix);
+    mat4.perspective(45, canvas.width / canvas.height, 1, 10000.0, graph.projectionMatrix);
     
     // Zkompiluj shader program
     graph.shaderProgram = createWebGLProgram();  
+}
+
+function drawGeometryObject(container) {
+
+  // FOR LIGHTMAPS
+  if(container.isItPoly){
+      //gl.uniform1i(shaderProgram.useLightingUniform, true);
+  }
+  else{
+      //gl.uniform1i(shaderProgram.useLightingUniform, false);
+  }  
+
+  // Drawing models from container
+  for (object in container.objects) {
+
+      // Transformed center of model
+      var newCenter = [0, 0, 0];
+
+      // Transform center according to bounding box
+      // mat4.multiplyVec3(mvMatrix, container.objects[object].center, newCenter);
+
+      // Set pipeline
+      gl.disable(gl.BLEND);
+      gl.enable(gl.DEPTH_TEST);
+      //gl.uniform1f(shaderProgram.alphaUniform, 1);
+
+      // Load vertices
+      gl.bindBuffer(gl.ARRAY_BUFFER, container.objects[object].vertexPositionBuffer);
+      gl.vertexAttribPointer(graph.shaderProgram.vertexPositionAttribute, 
+                             container.objects[object].vertexPositionBuffer.itemSize, 
+                             gl.FLOAT, false, 0, 0);
+
+      // Load texture coords
+      gl.bindBuffer(gl.ARRAY_BUFFER, container.objects[object].vertexTextureCoordBuffer);
+      gl.vertexAttribPointer(graph.shaderProgram.textureCoordAttribute, 
+                             container.objects[object].vertexTextureCoordBuffer.itemSize, 
+                             gl.FLOAT, false, 0, 0);
+/*
+      // If textures enabled, load textures
+      if(useTextures) {
+          gl.uniform1i(shaderProgram.useTexturesUniform, true);
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, materials[container.objects[object].material].textures[0]);
+          gl.uniform1i(shaderProgram.samplerUniform, 0);
+      }
+      else{
+          gl.uniform1i(shaderProgram.useTexturesUniform, false);
+      }
+*/
+/*
+      // If lightmaps enabled, load lightmaps
+      if(useLightmaps && objects.isItPoly){
+          
+          gl.uniform1i(shaderProgram.useLightmapUniform, 1);
+
+          gl.bindBuffer(gl.ARRAY_BUFFER, container.objects[object].vertexLightmapCoordBuffer);
+          gl.vertexAttribPointer(shaderProgram.lightmapCoordAttribute, 
+                                 container.objects[object].vertexLightmapCoordBuffer.itemSize, 
+                                 gl.FLOAT, false, 0, 0);
+          
+          gl.activeTexture(gl.TEXTURE1);
+          gl.bindTexture(gl.TEXTURE_2D, lightmaps[objects.polyID].lightmap );
+          gl.uniform1i(shaderProgram.lightmapSamplerUniform, 1);
+      }
+*/
+      // Load normals
+      //gl.bindBuffer(gl.ARRAY_BUFFER, container.objects[object].vertexNormalBuffer);
+      //gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, container.objects[object].vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+      // Load indices
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, container.objects[object].vertexIndexBuffer);
+
+      // Set matrices
+      //setMatrixUniforms();
+
+      // Draw model according to selected mode
+/*      if(renderMode == "triangles"){*/
+          gl.drawElements(gl.TRIANGLES, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+/*          
+      }
+      else if(renderMode == "points"){
+          gl.drawElements(gl.POINTS, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+      }
+      else if(renderMode == "lineStrip"){
+          gl.drawElements(gl.LINE_STRIP, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+      }
+      else if(renderMode == "lineLoop"){
+          gl.drawElements(gl.LINE_LOOP, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+      }
+      else if(renderMode == "lines"){
+          gl.drawElements(gl.LINES, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+      }
+      else if(renderMode == "triangleStrip"){
+          gl.drawElements(gl.TRIANGLE_STRIP, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+      }
+      else if(renderMode == "triangleFan"){
+          gl.drawElements(gl.TRIANGLE_FAN, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+      }
+      else if(renderMode == "quadStrip"){
+          gl.drawElements(gl.QUAD_STRIP, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+      }
+      else if(renderMode == "quads"){
+          gl.drawElements(gl.QUADS, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+      }
+      else if(renderMode == "polygon"){
+          gl.drawElements(gl.POLYGON, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+      }
+      else{
+          gl.drawElements(gl.TRIANGLES, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+      }
+*/
+      // Lightmaps off
+      //gl.uniform1i(shaderProgram.useLightmapUniform, 0);
+      //gl.uniform1i(shaderProgram.lightmapSamplerUniform, 0);
+  }
 }

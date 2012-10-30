@@ -660,7 +660,7 @@ function Material(structure) {
 
         // Asynchronous image load
         this.textures[texture].image.src = "./textures/" + structure["textures"][texture];
-        textureCount++;
+        //textureCount++;
     }
 }
 

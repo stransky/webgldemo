@@ -226,6 +226,10 @@
     }
 
     drawObject();
+    
+    for(cont in staticObjects) {
+      drawGeometryObject(staticObjects[cont]);
+    }
   }
     
   // Kresli scenu (hlavni smycka)
