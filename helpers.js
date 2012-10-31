@@ -38,98 +38,7 @@
  * This file contains additional functions used in Berusky 2 WebGL game.
  *
  */
-
-/**
-* Callback for showing some of measured parameters
-* and showing them into console.
-* Enabled by showFPSinConsole.
-*/
-function showFPS(){
-
-    if(showFPSinConsole){
-        console.log("FPS:"+fps+ " clippedObjects: " + clippedObjects + " static: " + staticCounter + " dynamic " + dynamicCounter);
-    }
-
-    // Reinitialization
-    fps = 0;
-    clippedObjects = 0;
-    staticCounter = 0;
-    dynamicCounter = 0;
-
-    // New timeout
-    if(showFPSinConsole){
-        fpsTimeoutID = setTimeout(showFPS, 1000);
-    }
-}
-
-/**
-* This function toggles rendering mode
-*/
-function changeRenderMode(){
-
-    if(log){
-        console.log("Changing render mode");
-    }
-
-    var nextRenderModeIndex = (++renderModeIndex) % renderModes.length;
-    renderModeIndex = nextRenderModeIndex;
-    
-    // New rendering mode
-    renderMode = renderModes[renderModeIndex];
-}
-
-/**
-* Toggles camera mode
-*/
-function changeCameraMode(){
-
-    var nextCameraModeIndex = (++cameraModeIndex) % cameraModes.length;
-    cameraModeIndex = nextCameraModeIndex;
-
-    // New Camera mode
-    cameraMode = cameraModes[cameraModeIndex];
-
-    /*if(useRotationInFPS && cameraMode == "fpsCamera"){
-
-
-    }*/
-}
-
-/**
-* Resets camera rotation and elevation, so that it
-* is behing the selected bug.
-*/
-function resetCamera(){
-
-    switch(logic.dynamicItems[logic.selectedBugID].direction){
-
-        case "up":
-            currentRotation = 90;
-            break;
-        case "right":
-            currentRotation = 180;
-            break;
-        case "down":
-            currentRotation = 270;
-            break;
-        case "left":
-            currentRotation = 360;
-            break;
-    }
-
-    currentRotation -= 90;
-
-    currentElevation = 15;
-}
-
-/**
-* Callback function for drawing bug with
-* original texture again
-*/
-function resetSelectionPainter(){
-
-    paintSelectedBugRed = false;
-}
+var MAX_NUMBER = Number.MAX_VALUE;
 
 /**
 * Determines if GUID belongs to static or dynamic object
@@ -184,23 +93,6 @@ function degToRad(degrees) {
 }
 
 /**
-* Used for measuring game performance
-*/
-function time(){
-
-    timeCounter += 10;  
-
-    if(showTime){
-        timeID = setTimeout(time, 10);
-    }
-    else{
-        if(log){
-            console.log("time " + (timeCounter));
-        }
-    }
- }
-
-/**
 * Clones object 
 * @param obj Object
 * @return Copied object
@@ -225,4 +117,22 @@ function toArray(strg){
     strg = strg.replace(/([0-9\.]+)(\s|\)|$)/g,"$1px$2");
     var res = strg.match(/(-?[0-9\.]+)(px|\%|em|pt)\s(-?[0-9\.]+)(px|\%|em|pt)/);
     return [parseFloat(res[1],10),res[2],parseFloat(res[3],10),res[4]];
+}
+
+function getMax(a,b) {
+    if(a > b)
+      return a;
+    else
+      return b;
+}
+
+function getMin(a,b) {
+    if(a < b)
+      return a;
+    else
+      return b;
+}
+
+function getCenter(min,max) {
+  return (min + (max-min)/2);
 }

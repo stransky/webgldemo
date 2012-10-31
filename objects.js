@@ -40,38 +40,6 @@
  */
 
 /**
-* This class is used for blending.
-* It contains all informations needed for blending
-* @param geometryObjectIn Model object reference
-* @param zValueIn Distance of model form camera
-* @param idIn ID of model object
-* @param staticIn True for static object and false for dynamic one
-* @return new BlendedObject
-*/
-function BlendedObject(geometryObjectIn, zValueIn, idIn, staticIn){
-
-    /**
-    * Reference to the model object
-    */
-    this.geometryObject = geometryObjectIn;
-    
-    /**
-    * Distance of model form camera
-    */
-    this.zValue = zValueIn;
-
-    /**
-    * ID of model object
-    */
-    this.id = idIn;
-
-    /**
-    * True for static object and false for dynamic one
-    */
-    this.staticObject = staticIn;
-}
-
-/**
 * Model class
 * Constructs object from JSON data
 * @contains name
@@ -84,6 +52,7 @@ function BlendedObject(geometryObjectIn, zValueIn, idIn, staticIn){
 * @contains max
 * @contains min
 * @contains center
+* @contains size
 * @contains frontPlaneBuffer
 * @contains backPlaneBuffer
 * @contains topPlaneBuffer
@@ -147,19 +116,6 @@ function GeometryObject(containerObject, isItPoly) {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(containerObject.vertexSpecular), gl.STATIC_DRAW);
         this.vertexSpecularColorBuffer.itemSize = 2;
         this.vertexSpecularColorBuffer.numItems = containerObject.vertexDiffuse.length / 2;
-        
-    }
-    else if(useLightmaps){
-        
-        /**
-        * Lightmap Texture Coordination Buffer 
-        */
-        this.vertexLightmapCoordBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexLightmapCoordBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(containerObject.vertexTextureCoordsLight), gl.STATIC_DRAW);
-        this.vertexLightmapCoordBuffer.itemSize = 2;
-        this.vertexLightmapCoordBuffer.numItems = containerObject.vertexTextureCoordsLight.length / 2;
-        
     }
 
     /** 
@@ -224,181 +180,8 @@ function GeometryObject(containerObject, isItPoly) {
         else if(vertexPositionInAxisZ < this.min[2]){
             this.min[2] = vertexPositionInAxisZ;
         }
-
     }
-
-    /** 
-    * Creating center of object
-    */
-    this.center = [];
-    this.center[0] = this.max[0] - this.min[0];
-    this.center[1] = this.max[1] - this.min[1];
-    this.center[2] = this.max[2] - this.min[2]; 
-
-    this.centerBackup = [];
     
-    /**
-    * Backs up center of object when using some
-    * transformation over the original one
-    */
-    this.backupCenter = function(){
-
-        this.centerBackup[0] = this.center[0];
-        this.centerBackup[1] = this.center[1];
-        this.centerBackup[2] = this.center[2];
-
-    }
-
-    /**
-    * Restores center of object
-    */
-    this.centerRestore = function(){
-
-        this.center[0] = this.centerBackup[0];
-        this.center[1] = this.centerBackup[1];
-        this.center[2] = this.centerBackup[2];
-    }
-
-    /**
-    * Creating Bounding Box of object
-    */
-    // FRONT PLANE
-    var frontPlane = [ 
-        this.max[0], this.max[1], this.min[2],
-        this.max[0], this.min[1], this.min[2],
-        this.min[0], this.max[1], this.min[2],   
-        this.min[0], this.min[1], this.min[2]
-    ]
-
-    // Front plane buffer
-    this.frontPlaneBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.frontPlaneBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(frontPlane), gl.STATIC_DRAW);
-    this.frontPlaneBuffer.itemSize = 3;
-    this.frontPlaneBuffer.numItems = 4;
-
-    // TOP PLANE 
-    var topPlane = [
-        this.max[0], this.max[1], this.min[2],
-        this.min[0], this.max[1], this.min[2],   
-        this.max[0], this.max[1], this.max[2],
-        this.min[0], this.max[1], this.max[2]
-    ]
-
-    // Top Plane buffer
-    this.topPlaneBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.topPlaneBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(topPlane), gl.STATIC_DRAW);
-    this.topPlaneBuffer.itemSize = 3;
-    this.topPlaneBuffer.numItems = 4;
-
-    // RIGHT PLANE
-    var rightPlane = [
-        this.max[0], this.max[1], this.min[2],
-        this.max[0], this.max[1], this.max[2],
-        this.max[0], this.min[1], this.min[2],
-        this.max[0], this.min[1], this.max[2]
-    ]
-
-    // Right plane buffer
-    this.rightPlaneBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.rightPlaneBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(rightPlane), gl.STATIC_DRAW);
-    this.rightPlaneBuffer.itemSize = 3;
-    this.rightPlaneBuffer.numItems = 4;
-
-    // LEFT PLANE
-    var leftPlane = [
-        this.min[0], this.max[1], this.min[2],   
-        this.min[0], this.max[1], this.max[2], 
-        this.min[0], this.min[1], this.min[2],   
-        this.min[0], this.min[1], this.max[2]
-    ]
-
-    // Left plane buffer
-    this.leftPlaneBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.leftPlaneBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(leftPlane), gl.STATIC_DRAW);
-    this.leftPlaneBuffer.itemSize = 3;
-    this.leftPlaneBuffer.numItems = 4;
-
-    // BACK PLANE
-    var backPlane = [  
-        this.min[0], this.max[1], this.max[2],  
-        this.min[0], this.min[1], this.max[2],
-        this.max[0], this.max[1], this.max[2],  
-        this.max[0], this.min[1], this.max[2]
-    ]
-
-    // Back plane buffer
-    this.backPlaneBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.backPlaneBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(backPlane), gl.STATIC_DRAW);
-    this.backPlaneBuffer.itemSize = 3;
-    this.backPlaneBuffer.numItems = 4;
-
-    // BOTTOM PLANE
-    var bottomPlane = [  
-        this.min[0], this.min[1], this.max[2],
-        this.max[0], this.min[1], this.max[2],
-        this.min[0], this.min[1], this.min[2],
-        this.max[0], this.min[1], this.min[2],
-    ]
-
-    // Bottom plane buffer
-    this.bottomPlaneBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.bottomPlaneBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(bottomPlane), gl.STATIC_DRAW);
-    this.bottomPlaneBuffer.itemSize = 3;
-    this.bottomPlaneBuffer.numItems = 4;
-
-    /**
-    * Envelope is created from 8 vertices
-    * as shown below
-    */
-    this.envelopePoints = [
-
-    /*
-              6____________7
-              /|          /|
-             / |         / |
-            /__|________/  |
-          2 |  |        |3 |
-            |  |        |  |
-            | 5|________|_ |8
-            | /         |  /
-            |/          | /
-            |           |/
-          1 _____________ 4
-
-    */
-
-        // 1
-        [this.min[0], this.min[1], this.max[2]],
-        
-        // 2
-        [this.min[0], this.max[1], this.max[2]],
-
-        // 3
-        [this.max[0], this.max[1], this.max[2]],
-
-        // 4
-        [this.max[0], this.min[1], this.max[2]],
-
-        // 5
-        [this.min[0], this.min[1], this.min[2]],
-
-        // 6
-        [this.min[0], this.max[1], this.min[2]],
-
-        // 7
-        [this.max[0], this.max[1], this.min[2]],
-
-        // 8
-        [this.max[0], this.min[1], this.min[2]]
-
-    ]
-
     /**
     * Vertex Index Buffer 
     */
@@ -407,6 +190,19 @@ function GeometryObject(containerObject, isItPoly) {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(containerObject.indices), gl.STATIC_DRAW);
     this.vertexIndexBuffer.itemSize = 1;
     this.vertexIndexBuffer.numItems = containerObject.indices.length;
+
+    /** 
+    * Creating center of object
+    */
+    this.size = [];
+    this.size[0] = this.max[0] - this.min[0];
+    this.size[1] = this.max[1] - this.min[1];
+    this.size[2] = this.max[2] - this.min[2];
+    
+    this.center = [];
+    this.center[0] = getCenter(this.min[0], this.max[0]);
+    this.center[1] = getCenter(this.min[1], this.max[1]);
+    this.center[2] = getCenter(this.min[2], this.max[2]);
 }
 
 /**
@@ -464,11 +260,45 @@ function GeometryContainer(container) {
     */
     var containerObjectCounter = 0;
     for (containerObject in container["geometry_objects"]) {
-
         // Adding new GeometryObject
         this.objects[containerObjectCounter] = new GeometryObject(container["geometry_objects"][containerObject], this.isItPoly);
         containerObjectCounter++;
     }
+
+    /* Size and center attributes
+    */
+    this.center = [];
+    this.size = [];
+    this.min = [];
+    this.max = [];
+    
+    this.sizeCalc = function() {      
+      var min = [ MAX_NUMBER, MAX_NUMBER, MAX_NUMBER ];
+      var max = [-MAX_NUMBER,-MAX_NUMBER,-MAX_NUMBER ];
+    
+      for (i in this.objects) {                
+        min[0] = getMin(min[0], this.objects[i].min[0]);
+        min[1] = getMin(min[1], this.objects[i].min[1]);
+        min[2] = getMin(min[2], this.objects[i].min[2]);
+        
+        max[0] = getMax(max[0], this.objects[i].max[0]);
+        max[1] = getMax(max[1], this.objects[i].max[1]);
+        max[2] = getMax(max[2], this.objects[i].max[2]);
+      }
+      
+      this.min = min;
+      this.max = max;
+      
+      this.center[0] = getCenter(min[0], max[0]);
+      this.center[1] = getCenter(min[1], max[1]);
+      this.center[2] = getCenter(min[2], max[2]);
+      
+      this.size[0] = max[0] - min[0];
+      this.size[1] = max[1] - min[1];
+      this.size[2] = max[2] - min[2];
+    }
+    
+    this.sizeCalc();
 }
 
 /**
@@ -505,82 +335,6 @@ function Light( structure ){
 }	
 
 /**
-* Lightmap class
-* @contains id
-* @contains path
-* @contains lightmap
-* @param id ID of lithtmap
-* @param path Path to lightmap
-* @return new Lightmap object
-*/
-function Lightmap(id, path) {
-	
-    /**
-    * ID of lightmap
-    */
-	this.id = id;
-	
-    /** 
-    * Path to lightmap image
-    */
-    this.path = path + "/lightmap_" + id + lightmapFileType;
-	
-    /**
-    * Lightmap texture buffer
-    */
-	this.lightmap = gl.createTexture();
-	
-    /** 
-    * Lightmap image
-    */
-    this.lightmap.image = new Image();
-	
-    // Saving this reference for onload function	
-	var that = this;
-	
-    // Settings onload handler
-	this.lightmap.image.onload = function() {
-		
-        //TODO
-        if(!that.lightmap.image) return;
-
-        /**
-        * There is different coordination system in WebGL, so every
-        * texture has to be fliiped aroud Y axis.
-        * Point [0, 0] is top left corner of texture.
-        */
-		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-
-        // You have to bind texture before working with it
-		gl.bindTexture(gl.TEXTURE_2D, that.lightmap);
-
-        // Loading texture into GPU
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, that.lightmap.image); 
-
-        // Magnify filtering - how texture acts when being upscaled
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-
-        // How texture acts when being downscaled
-		gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-
-        // Mipmap generation - diffent textures for different camera distance
-		gl.generateMipmap(gl.TEXTURE_2D); 
-		
-        // Unbind
-		gl.bindTexture(gl.TEXTURE_2D, null);
-	}
-	
-	try{
-
-        // Settings path to lightmap
-		this.lightmap.image.src = this.path;
-	}
-	catch(e){
-		;
-	}	
-}
-
-/**
 * Material class
 * Loads information about material from JSON file,
 * loads image from server a creates texture buffers.
@@ -601,11 +355,6 @@ function Material(structure) {
     * Incates whether use blending or not on this material
     */
     this.blending = false;
-
-    // Blening is used only for this texture...little hack
-    if(this.name == "8_voda1"){
-        this.blending = true;
-    }
 
     /**
     * Texture array

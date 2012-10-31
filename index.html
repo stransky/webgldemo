@@ -57,8 +57,9 @@
 <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
 <script type="text/javascript" src="webgl-utils.js"></script>
 
-<script type="text/javascript" src="textures.js"></script>
 <script type="text/javascript" src="helpers.js"></script>
+<script type="text/javascript" src="scene.js"></script>
+<script type="text/javascript" src="textures.js"></script>
 <script type="text/javascript" src="logic.js"></script>
 <script type="text/javascript" src="objects.js"></script>
 <script type="text/javascript" src="loaders.js"></script>
@@ -195,7 +196,7 @@
     gl.uniform1i(graph.shaderProgram.samplerUniform, 0);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
-    
+/*    
     if(control.keys[KeyEvent.DOM_VK_UP]) {
       mat4.translate(graph.worldMatrix, [0,1,0]);
     }
@@ -208,7 +209,7 @@
     if(control.keys[KeyEvent.DOM_VK_LEFT]) {
       mat4.translate(graph.worldMatrix, [-1,0,0]);
     }
-    
+*/    
     modelViewMatrixSet();
     setMatrixUniforms();
     gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
@@ -217,18 +218,11 @@
   function drawScene() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    if(graph.camera.changed) {
-      graph.cameraMatrix = cameraSet(graph.camera.position, 
-                                     graph.camera.rotation,
-                                     graph.camera.elevation,
-                                     graph.camera.distance);
-      graph.camera.changed = 0;
-    }
-
+    handleCamera();    
     drawObject();
-    
-    for(cont in staticObjects) {
-      drawGeometryObject(staticObjects[cont]);
+        
+    for(cont in scene.staticObjects) {
+      drawGeometryObject(scene.staticObjects[cont]);
     }
   }
     
@@ -240,22 +234,22 @@
     // dopocitej zmeny mysi
     calcMouse();
 
-    // 
-    handleCamera();
+    //
+    handleCameraControl();
 
     // Kresli scenu & spol.
-    drawScene();    
+    drawScene();
   }
 
   // Start!
   function DemoStart() {
     graphicsInit();
     inputInit();
-
     initBuffers();
-        
+    
     loadTexture("test.jpg", 0);
     loadScene("test_level.json");
+    //cameraCenter(scene.center, scene.size);
 
     animationFrame();
   }

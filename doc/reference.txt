@@ -63,6 +63,8 @@ Problemy (co se resi):
   - vstup od uzivatele (klavesnice/mys)
   - casovace (ruzne druhy)
 
+https://developer.mozilla.org/en-US/docs/JavaScript_typed_arrays/ArrayBufferView#Typed_array_subclasses
+
 Fullscreen API (ff9)
   
 Problemy specificke pro js:

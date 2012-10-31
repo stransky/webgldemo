@@ -40,41 +40,7 @@
  *
  */
 
-/**
-* Array of dynamic GeometryContainer
-* objects
-*/
-var dynamicObjects = [];
-var dynamicObjectsNum;
-
-/**         
-* Array of static GeometryContainer
-* objects
-*/  
-var staticObjects = [];
-var staticObjectsNum;
-
-/**
-* Logic representation of game field
-*/
-var logic;
-
-/**
-* Lights in the scene
-*/
-var lights = [];
-var lightsNum;
-
-/**
-* Lightmaps in the scene
-*/
-var lightmaps = [];
-
-/**
-* Game materials
-*/
-var materials = [];
-var useLightmaps = 0;
+useLightmaps = 0;
 
 /**
 * Handles JSON file
@@ -85,8 +51,8 @@ function handleLoadedJSON(inputJSON) {
 
     var i;
     var j = 0;
-    staticObjectsNum = 0;
-    dynamicObjectsNum = 0;
+    var staticObjectsNum = 0;
+    var dynamicObjectsNum = 0;
     lightsNum = 0;
 
     // Loading JSON file
@@ -96,35 +62,15 @@ function handleLoadedJSON(inputJSON) {
         if ((inputJSON[structure].type == "geometry_container" || 
              inputJSON[structure].type == "geometry_container_poly") && 
              !(parseInt(inputJSON[structure].hierarchy_level) > 0)) {
-
-            // Poly container
-            if(inputJSON[structure].type == "geometry_container_poly"){
-                
-                // Using lightmaps
-                if(useLightmaps){
-                    try{
-                            var polyID = parseInt(inputJSON[structure].poly_id);
-                            // Load lightmap
-                            lightmaps[polyID] = (new Lightmap(polyID, (lightmapPath + selectedLevel)));
-                    }
-                    catch(error){
-                        ;
-                    }
-                }
-            }
             
             // Dynamic container
-            if (inputJSON[structure]["container_id"] != -1) {
-
-                // Create dynamic item object
-                dynamicObjects[inputJSON[structure]["container_id"]] = new GeometryContainer(inputJSON[structure]);
+            if (inputJSON[structure]["container_id"] != -1) {                
+                scene.dynamicObjects[inputJSON[structure]["container_id"]] = new GeometryContainer(inputJSON[structure]);
                 dynamicObjectsNum++;
             } 
             // Static container
-            else {
-
-                // Create static item object
-                staticObjects[staticObjectsNum] = new GeometryContainer(inputJSON[structure]);
+            else {                
+                scene.staticObjects[staticObjectsNum] = new GeometryContainer(inputJSON[structure]);
                 staticObjectsNum++;
             }
         } 
@@ -132,21 +78,21 @@ function handleLoadedJSON(inputJSON) {
         else if (inputJSON[structure].type == "material") {
 
             // Create material object
-            materials["" + inputJSON[structure].name] = new Material(inputJSON[structure]);
+            scene.materials["" + inputJSON[structure].name] = new Material(inputJSON[structure]);
         } 
         // Level logic
         else if (inputJSON[structure].type == "level_logic") {
 
             // Create logic object
-            logic = new Logic(inputJSON[structure]);
+            scene.logic = new Logic(inputJSON[structure]);
 
         }
         // Light
         else if(inputJSON[structure].type == "light"){
 
             // Create light object
-            lights.push(new Light(inputJSON[structure]));
-            lightsNum++;
+            scene.lights.push(new Light(inputJSON[structure]));
+            scene.lightsNum++;
         }
     }
     
@@ -157,12 +103,12 @@ function handleLoadedJSON(inputJSON) {
     var light = {
         "type" : "light",
         "name" : "Svetlo 0",
-        "position" : [ logic.centerX, 0, logic.centerZ],
+        "position" : [ scene.logic.centerX, 0, scene.logic.centerZ],
         "diffuse_color" : [ 0.8, 0.8, 0.8],
         "coeficients" : [ 0.000000, 0.250000, 0.000000],
         "max_range" : "5.000000"
     }
-    lights[0] = new Light( light );
+    scene.lights[0] = new Light( light );
     
     // Set lightning
     if (lightning) {
@@ -188,7 +134,7 @@ function handleLoadedJSON(inputJSON) {
       "textures" : [ "256_beruska1_chosen.jpg" ]
     }
 
-    materials[selectedBugTexture.name] = new Material(selectedBugTexture);
+    scene.materials[selectedBugTexture.name] = new Material(selectedBugTexture);
 
     // Create floor texture
     var floorTexture = {
@@ -204,10 +150,16 @@ function handleLoadedJSON(inputJSON) {
       "textures" : [ "floor_metal.jpg" ]
     }
 
-    materials[floorTexture.name] = new Material(floorTexture);
-    
-    console.log("Loaded static objects = " + staticObjectsNum + "\n");
-    console.log("Loaded dynamic objects = " + dynamicObjectsNum + "\n");
+    scene.staticObjectsNum = staticObjectsNum;
+    scene.dynamicObjectsNum = dynamicObjectsNum;
+
+    scene.materials[floorTexture.name] = new Material(floorTexture);
+    scene.sizeCalc();
+
+    console.log("Loaded static objects = " + scene.staticObjectsNum + "\n");
+    console.log("Loaded dynamic objects = " + scene.dynamicObjectsNum + "\n");
+    console.log("Scene center = " + scene.center + "\n");
+    console.log("Scene size = " + scene.size + "\n");
 }
 
 /**

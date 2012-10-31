@@ -47,7 +47,8 @@ graph.camera = new Object();
 graph.camera.position = [0.0, 0.0, 0.0];
 graph.camera.rotation = 0.0;
 graph.camera.elevation = Math.PI/4; // 45 stupnu
-graph.camera.distance = 10.0;
+//graph.camera.distance = 10.0;
+graph.camera.distance = 100.0;
 graph.camera.changed = 1;
 
 /* Zkompiluje DOM element script s programem shaderu 
@@ -149,14 +150,6 @@ function graphicsInit() {
 
 function drawGeometryObject(container) {
 
-  // FOR LIGHTMAPS
-  if(container.isItPoly){
-      //gl.uniform1i(shaderProgram.useLightingUniform, true);
-  }
-  else{
-      //gl.uniform1i(shaderProgram.useLightingUniform, false);
-  }  
-
   // Drawing models from container
   for (object in container.objects) {
 
@@ -194,22 +187,7 @@ function drawGeometryObject(container) {
           gl.uniform1i(shaderProgram.useTexturesUniform, false);
       }
 */
-/*
-      // If lightmaps enabled, load lightmaps
-      if(useLightmaps && objects.isItPoly){
-          
-          gl.uniform1i(shaderProgram.useLightmapUniform, 1);
 
-          gl.bindBuffer(gl.ARRAY_BUFFER, container.objects[object].vertexLightmapCoordBuffer);
-          gl.vertexAttribPointer(shaderProgram.lightmapCoordAttribute, 
-                                 container.objects[object].vertexLightmapCoordBuffer.itemSize, 
-                                 gl.FLOAT, false, 0, 0);
-          
-          gl.activeTexture(gl.TEXTURE1);
-          gl.bindTexture(gl.TEXTURE_2D, lightmaps[objects.polyID].lightmap );
-          gl.uniform1i(shaderProgram.lightmapSamplerUniform, 1);
-      }
-*/
       // Load normals
       //gl.bindBuffer(gl.ARRAY_BUFFER, container.objects[object].vertexNormalBuffer);
       //gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, container.objects[object].vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -221,41 +199,8 @@ function drawGeometryObject(container) {
       //setMatrixUniforms();
 
       // Draw model according to selected mode
-/*      if(renderMode == "triangles"){*/
-          gl.drawElements(gl.TRIANGLES, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-/*          
-      }
-      else if(renderMode == "points"){
-          gl.drawElements(gl.POINTS, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-      }
-      else if(renderMode == "lineStrip"){
-          gl.drawElements(gl.LINE_STRIP, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-      }
-      else if(renderMode == "lineLoop"){
-          gl.drawElements(gl.LINE_LOOP, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-      }
-      else if(renderMode == "lines"){
-          gl.drawElements(gl.LINES, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-      }
-      else if(renderMode == "triangleStrip"){
-          gl.drawElements(gl.TRIANGLE_STRIP, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-      }
-      else if(renderMode == "triangleFan"){
-          gl.drawElements(gl.TRIANGLE_FAN, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-      }
-      else if(renderMode == "quadStrip"){
-          gl.drawElements(gl.QUAD_STRIP, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-      }
-      else if(renderMode == "quads"){
-          gl.drawElements(gl.QUADS, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-      }
-      else if(renderMode == "polygon"){
-          gl.drawElements(gl.POLYGON, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-      }
-      else{
-          gl.drawElements(gl.TRIANGLES, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-      }
-*/
+      gl.drawElements(gl.TRIANGLES, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+      
       // Lightmaps off
       //gl.uniform1i(shaderProgram.useLightmapUniform, 0);
       //gl.uniform1i(shaderProgram.lightmapSamplerUniform, 0);
