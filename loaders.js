@@ -155,6 +155,8 @@ function handleLoadedJSON(inputJSON) {
 
     scene.materials[floorTexture.name] = new Material(floorTexture);
     scene.sizeCalc();
+    
+    cameraCenter(scene.center, scene.size);
 
     console.log("Loaded static objects = " + scene.staticObjectsNum + "\n");
     console.log("Loaded dynamic objects = " + scene.dynamicObjectsNum + "\n");

@@ -47,8 +47,8 @@ graph.camera = new Object();
 graph.camera.position = [0.0, 0.0, 0.0];
 graph.camera.rotation = 0.0;
 graph.camera.elevation = Math.PI/4; // 45 stupnu
-//graph.camera.distance = 10.0;
-graph.camera.distance = 100.0;
+graph.camera.distance = 10.0;
+//graph.camera.distance = 100.0;
 graph.camera.changed = 1;
 
 /* Zkompiluje DOM element script s programem shaderu 
@@ -175,18 +175,12 @@ function drawGeometryObject(container) {
       gl.vertexAttribPointer(graph.shaderProgram.textureCoordAttribute, 
                              container.objects[object].vertexTextureCoordBuffer.itemSize, 
                              gl.FLOAT, false, 0, 0);
-/*
-      // If textures enabled, load textures
-      if(useTextures) {
-          gl.uniform1i(shaderProgram.useTexturesUniform, true);
-          gl.activeTexture(gl.TEXTURE0);
-          gl.bindTexture(gl.TEXTURE_2D, materials[container.objects[object].material].textures[0]);
-          gl.uniform1i(shaderProgram.samplerUniform, 0);
-      }
-      else{
-          gl.uniform1i(shaderProgram.useTexturesUniform, false);
-      }
-*/
+
+      // If textures enabled, load textures      
+      gl.uniform1i(graph.shaderProgram.useTexturesUniform, true);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, scene.materials[container.objects[object].material].textures[0]);
+      gl.uniform1i(graph.shaderProgram.samplerUniform, 0);
 
       // Load normals
       //gl.bindBuffer(gl.ARRAY_BUFFER, container.objects[object].vertexNormalBuffer);
