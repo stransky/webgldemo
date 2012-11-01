@@ -84,20 +84,27 @@ function handleCameraControl() {
   
   // camera zoom 
   if(control.keys[KeyEvent.DOM_VK_EQUALS]) {
-    //graph.camera.distance -= 0.5;
-    graph.camera.distance -= 30;
+    graph.camera.distance -= 0.5;
+    //graph.camera.distance -= 30;
     graph.camera.changed = 1;
   }
   if(control.keys[KeyEvent.DOM_VK_HYPHEN_MINUS]) {
-    //graph.camera.distance += 0.5;
-    graph.camera.distance += 30;
+    graph.camera.distance += 0.5;
+    //graph.camera.distance += 30;
     graph.camera.changed = 1;
   }
 
   // Camera center
   if(control.keys[KeyEvent.DOM_VK_C]) {
-    scene.sizeCalc();
-    cameraCenter(scene.center, scene.size);
+    if(control.keys[KeyEvent.DOM_VK_SHIFT]) {
+      scene.sizeCalc();
+      cameraCenter(scene.center, scene.size);
+    }
+    else {
+      var center = [ scene.logic.centerX, scene.logic.centerY, scene.logic.centerZ];
+      var size = [ scene.logic.sizeX, scene.logic.sizeY, scene.logic.sizeZ];
+      cameraCenter(center, size);
+    }
   }
 
   if(control.keys[KeyEvent.DOM_VK_CONTROL]) {

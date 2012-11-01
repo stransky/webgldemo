@@ -23,17 +23,27 @@
   
   // Me promene s pozici vertextu a koordinatama textur
   attribute vec3 aVertexPosition;
-  attribute vec2 aTextureCoord;
+  attribute vec2 aTextureCoord;  
+  attribute vec3 aVertexNormal;
   
   // Me matice (View a Projection)
   uniform mat4 uMVMatrix;
   uniform mat4 uPMatrix;
   
   // varying - prenasi se do pixel shaderu interpolaci mezi vertexy
-  varying vec2 vTextureCoord;
-      
+  varying vec2  vTextureCoord;
+  varying float fTextureColor;
+
+  mat4 finalMatrix;
+  vec4 finalNormal;
+    
   void main(void) {
-    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+    finalMatrix = uPMatrix * uMVMatrix;
+    
+    gl_Position = finalMatrix * vec4(aVertexPosition, 1.0);
+    finalNormal = vec4(aVertexNormal, 0.0);
+    
+    fTextureColor = dot(finalNormal, vec4(0.6,-0.6,0.6,0));
     vTextureCoord = aTextureCoord;
   }
 </script>
@@ -44,13 +54,17 @@
   precision mediump float;
   
   // varying - interpolovana hodnota z vertex shaderu
-  varying vec2 vTextureCoord;
+  varying vec2      vTextureCoord;
+  varying float     fTextureColor;
   
   // konstanta - zde pro pouzitou texturu
   uniform sampler2D uTexture;
   
+  vec4              vTextColor;
+  
   void main(void) {
-      gl_FragColor = texture2D(uTexture, vec2(vTextureCoord.s, vTextureCoord.t));
+      vTextColor = texture2D(uTexture, vec2(vTextureCoord.s, vTextureCoord.t));      
+      gl_FragColor = vTextColor * vec4(fTextureColor, fTextureColor, fTextureColor, 1);      
   }
 </script>
 
@@ -68,16 +82,6 @@
 <script type="text/javascript" src="camera.js"></script>
 
 <script>  
-  // Calc final matrix (modelViewMatrix)
-  function modelViewMatrixSet() {
-    mat4.multiply(graph.cameraMatrix, graph.worldMatrix, graph.modelViewMatrix);
-  }  
-
-  // Set matrices for shader program
-  function setMatrixUniforms() {
-    gl.uniformMatrix4fv(graph.shaderProgram.pMatrixUniform, false, graph.projectionMatrix);
-    gl.uniformMatrix4fv(graph.shaderProgram.mvMatrixUniform, false, graph.modelViewMatrix);
-  }
   
   function drawScene() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -86,10 +90,7 @@
     
     modelViewMatrixSet();
     setMatrixUniforms();
-    /*
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, globalTextures[0]);
-    */
+    
     for(cont in scene.staticObjects) {
       drawGeometryObject(scene.staticObjects[cont]);
     }    
@@ -119,7 +120,7 @@
     inputInit();    
     
     loadTexture("test.jpg", 0);
-    loadScene("levels/level210.json");
+    loadScene("levels/level28.json");
 
     animationFrame();
   }

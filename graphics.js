@@ -48,7 +48,6 @@ graph.camera.position = [0.0, 0.0, 0.0];
 graph.camera.rotation = 0.0;
 graph.camera.elevation = Math.PI/4; // 45 stupnu
 graph.camera.distance = 10.0;
-//graph.camera.distance = 100.0;
 graph.camera.changed = 1;
 
 /* Zkompiluje DOM element script s programem shaderu 
@@ -117,6 +116,10 @@ function createWebGLProgram() {
     program.textureCoordAttribute = gl.getAttribLocation(program, "aTextureCoord");
     gl.enableVertexAttribArray(program.textureCoordAttribute);
 
+    // Getting reference to Vertex normal attribute
+    program.vertexNormalAttribute = gl.getAttribLocation(program, "aVertexNormal");
+    gl.enableVertexAttribArray(program.vertexNormalAttribute);
+
     // Nacti indexy pro matice
     program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix");
     program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
@@ -148,6 +151,17 @@ function graphicsInit() {
     graph.shaderProgram = createWebGLProgram();  
 }
 
+// Calc final matrix (modelViewMatrix)
+function modelViewMatrixSet() {
+  mat4.multiply(graph.cameraMatrix, graph.worldMatrix, graph.modelViewMatrix);
+}  
+
+// Set matrices for shader program
+function setMatrixUniforms() {
+  gl.uniformMatrix4fv(graph.shaderProgram.pMatrixUniform, false, graph.projectionMatrix);
+  gl.uniformMatrix4fv(graph.shaderProgram.mvMatrixUniform, false, graph.modelViewMatrix);
+}
+
 function drawGeometryObject(container) {
 
   // Drawing models from container
@@ -158,11 +172,12 @@ function drawGeometryObject(container) {
 
       // Transform center according to bounding box
       // mat4.multiplyVec3(mvMatrix, container.objects[object].center, newCenter);
+      modelViewMatrixSet();
+      setMatrixUniforms();
 
       // Set pipeline
       gl.disable(gl.BLEND);
       gl.enable(gl.DEPTH_TEST);
-      //gl.uniform1f(shaderProgram.alphaUniform, 1);
 
       // Load vertices
       gl.bindBuffer(gl.ARRAY_BUFFER, container.objects[object].vertexPositionBuffer);
@@ -183,20 +198,16 @@ function drawGeometryObject(container) {
       gl.uniform1i(graph.shaderProgram.samplerUniform, 0);
 
       // Load normals
-      //gl.bindBuffer(gl.ARRAY_BUFFER, container.objects[object].vertexNormalBuffer);
-      //gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, container.objects[object].vertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+      gl.bindBuffer(gl.ARRAY_BUFFER, container.objects[object].vertexNormalBuffer);
+      gl.vertexAttribPointer(graph.shaderProgram.vertexNormalAttribute, 
+                             container.objects[object].vertexNormalBuffer.itemSize,
+                             gl.FLOAT, false, 0, 0);
 
       // Load indices
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, container.objects[object].vertexIndexBuffer);
 
-      // Set matrices
-      //setMatrixUniforms();
-
       // Draw model according to selected mode
-      gl.drawElements(gl.TRIANGLES, container.objects[object].vertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-      
-      // Lightmaps off
-      //gl.uniform1i(shaderProgram.useLightmapUniform, 0);
-      //gl.uniform1i(shaderProgram.lightmapSamplerUniform, 0);
+      gl.drawElements(gl.TRIANGLES, container.objects[object].vertexIndexBuffer.numItems, 
+                      gl.UNSIGNED_SHORT, 0);      
   }
 }

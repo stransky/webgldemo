@@ -1,2 +1,3 @@
-- scene center
-- rendering (when the default cube is off)
+- camera center to level
+- camera movement
+- back face culling
