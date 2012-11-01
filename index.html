@@ -92,6 +92,9 @@
     */
     for(cont in scene.staticObjects) {
       drawGeometryObject(scene.staticObjects[cont]);
+    }    
+    for(cont in scene.dynamicObjects) {
+      drawGeometryObject(scene.dynamicObjects[cont]);
     }
   }
     
@@ -116,7 +119,7 @@
     inputInit();    
     
     loadTexture("test.jpg", 0);
-    loadScene("test_level.json");    
+    loadScene("levels/level210.json");
 
     animationFrame();
   }

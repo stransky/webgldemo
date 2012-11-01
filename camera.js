@@ -84,13 +84,13 @@ function handleCameraControl() {
   
   // camera zoom 
   if(control.keys[KeyEvent.DOM_VK_EQUALS]) {
-    graph.camera.distance -= 0.5;
-    //graph.camera.distance -= 30;
+    //graph.camera.distance -= 0.5;
+    graph.camera.distance -= 30;
     graph.camera.changed = 1;
   }
   if(control.keys[KeyEvent.DOM_VK_HYPHEN_MINUS]) {
-    graph.camera.distance += 0.5;
-    //graph.camera.distance += 30;
+    //graph.camera.distance += 0.5;
+    graph.camera.distance += 30;
     graph.camera.changed = 1;
   }
 

@@ -402,14 +402,13 @@ function Material(structure) {
 
             // Unbind
             gl.bindTexture(gl.TEXTURE_2D, null);
-
-            // Actualization of progressbar
-            textureLoaded();
         }
 
         // Asynchronous image load
         this.textures[texture].image.src = "./textures/" + structure["textures"][texture];
         //textureCount++;
+        
+        console.log("Texture = " + this.textures[texture].image.src + "\n");
     }
 }
 
