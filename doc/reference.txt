@@ -10,63 +10,25 @@ https://github.com/toji/gl-matrix
 http://browserquest.mozilla.org/ -> MMO
 http://play-ttd.com/play/
 
-http://www.khronos.org/registry/webgl/specs/latest/
-
-Otazky (Tricka):
-Co to je? (ES)
-Otazka do plena -> je webgl 3d? (za tricko)
-vec4(aVertexPosition, 1.0); -> proc toto?
-
-Proc web?
-- jede vsude, internet, multiplayer
-- porovnani s Flash
+Problemy (co se resi):
+- Cela aplikace je 1 html stranka - musime s tim pocitat
+  - AJAX - JSON data (loading)
+  - vstup od uzivatele (klavesnice/mys)
+- Data loading
+- Obrazky (grafika)
 
 - jak prepnout fo fullscreenu? (ale opravdoveho)
-
-Emscripten -> LLVM to JS, SDL to canvas
-https://github.com/kripken/emscripten/wiki -> Portovane hry do js
-
-https://github.com/cjcliffe/CubicVR.js/ - 3D engine?
-
-Slidy:
-- Co to je? (ES)
-- Otazka do plena -> je webgl 3d? (za tricko)
-
-- Inicializace - canavas?
-
-<html>
-<body>
-<canvas id="muj_canvas" style="border: none;" width="500" height="500">
-</canvas>
-</body>
-</html>
-
-// Nactu z DOM
-var canvas = document.getElementById("muj_canvas");
-gfx = canvas.getContext("2d"); // objekt na 2D kresleni
-gl = canvas.getContext("experimental-webgl"); // gl objekt
 
 2D animace -> casovac
 http://www.html5canvastutorials.com/advanced/html5-canvas-linear-motion-animation/
 
 // Rozdil oproti GL -> pouze vertex/fragment shaders 
-- dela se flip?
-
 // Loading textur
-
-
-Problemy (co se resi):
-- Cela aplikace je 1 html stranka - musime s tim pocitat
-  - AJAX - JSON data (loading)
-  - opakovani renderingu stranky
-    requestAnimationFrame() z Google Chrome utilities
-  - vstup od uzivatele (klavesnice/mys)
-  - casovace (ruzne druhy)
 
 https://developer.mozilla.org/en-US/docs/JavaScript_typed_arrays/ArrayBufferView#Typed_array_subclasses
 
 Fullscreen API (ff9)
-  
+
 Problemy specificke pro js:
   - techniky ktere umozni JIT
   - vyhnout se konverzi na double, nepouzivat eval&spol. a podobne
@@ -74,7 +36,6 @@ Problemy specificke pro js:
 
 Bezne techniky:
 - da se ten canavas resizovat? (kdyz se me zmeni rozliseni obrazovky - fullscreen)
-
 - canvas 2D - jak se nahravaji obrazky, je tam "flip" cele obrazovky?
 
 Debugovani - Firebug:

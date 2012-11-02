@@ -94,28 +94,32 @@
 		</section>
 	</div></div>
 
-  <div class="slide" id="Choices"><div>
+  <div class="slide" id="Native_apps"><div>
 		<section>
 			<header>
-				<h2>Developer's choices</h2>
+				<h2>Native web application</h2>
 			</header>			
-        <ul>
-        <li>Native web application
         <ul>
           <li>Written in pure JS</li>
           <li>Utilize &lt;canvas&gt;, WebGL</li>
-          <li>JS libraries - glMatrix, jQuery</li>
+          <li>JS libraries - glMatrix, jQuery, CubicVR.js (3D engine)</li>
+          <li><a href="http://browserquest.mozilla.org/" target="_blank">Browser Quest</a></li>
+          <li><a href="http://operasoftware.github.com/Emberwind/" target="_blank">Emberwind</a></li>
         </ul>        
-        </li>
-        <li>Converted from C/C++
+		</section>
+	</div></div>
+  
+  <div class="slide" id="Converted_apps"><div>
+		<section>
+			<header>
+				<h2>C/C++ conversion</h2>
+			</header>
         <ul>
-          <li>Emscripten (LLVM-to-JS compiler)</li>
+          <li><a href="https://github.com/kripken/emscripten/wiki" target="_blank">Emscripten</a> (LLVM-to-JS compiler)</li>
           <li>SDL/WebGL to &lt;canvas&gt; wrapper</li>
           <li>~10x slower than gcc -O3</li>
-          <li>Cube2 port - <a href="https://developer.mozilla.org/en-US/demos/detail/bananabread/launch" target="_blank">
-              BananaBread demo</a></li>          
-        </ul>
-        </li>
+          <li><a href="https://developer.mozilla.org/en-US/demos/detail/bananabread/launch" target="_blank">BananaBread (Cube 2: Sauerbraten port)</a></li>
+          <li><a href="http://play-ttd.com/play/" target="_blank">OpenTycoon</a></li>
         </ul>
 		</section>
 	</div></div>
@@ -128,9 +132,9 @@
         <pre>
         <code>&lt;html&gt;</code>
         <code>&lt;script&gt;</code>
-        <code>  function <mark>GameStart()</mark> {</code>
-        <code>    ...</code>
-        <code>  }</code>
+        <code>    function <mark>GameStart()</mark> {</code>
+        <code>        ...</code>
+        <code>    }</code>
         <code>&lt;/script&gt;</code>
         <code>&lt;body <mark>onload</mark>="GameStart()"&gt;</code>
         <code>&lt;<mark>canvas</mark> id="canvas_id" width="500" height="500"&gt;&lt;/canvas&gt;</code>
@@ -147,9 +151,9 @@
 			</header>			        
    			<pre>
         <code>function GameStart() {</code>
-        <code>  var <mark>canvas</mark> = document.getElementById("<mark>canvas_id</mark>");</code>
-        <code>  <mark>context</mark> = canvas.getContext("<mark>2d</mark>");</code>
-        <code>  context.<mark>fillRect</mark>(0, 0, canvas.width, canvas.height);</code>
+        <code>    var <mark>canvas</mark> = document.getElementById("<mark>canvas_id</mark>");</code>
+        <code>    <mark>context</mark> = canvas.getContext("<mark>2d</mark>");</code>
+        <code>    context.<mark>fillRect</mark>(0, 0, canvas.width, canvas.height);</code>
         <code>}</code>
         </pre>        
         <a href="examples/skeleton.html" target="_blank">demo</a><br>
@@ -166,16 +170,58 @@
 			</header>			        
    			<pre>
         <code>function GameStart() {</code>
-        <code>  var <mark>canvas</mark> = document.getElementById("<mark>canvas_id</mark>");</code>
-        <code>  <mark>gl</mark> = canvas.getContext("<mark>experimental-webgl</mark>");</code>
-        <code>  gl.clearColor(0.0, 0.0, 0.0, 1.0);</code>
-        <code>  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);</code>
+        <code>    var <mark>canvas</mark> = document.getElementById("<mark>canvas_id</mark>");</code>
+        <code>    <mark>gl</mark> = canvas.getContext("<mark>experimental-webgl</mark>");</code>
+        <code>    gl.clearColor(0.0, 0.0, 0.0, 1.0);</code>
+        <code>    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);</code>
         <code>}</code>
         </pre>        
         <a href="examples/skeleton_gl.html" target="_blank">demo</a><br>
         Specification:<br>
         <a href="http://www.khronos.org/registry/webgl/specs/latest//" target="_blank">
                  http://www.khronos.org/registry/webgl/specs/latest/</a>
+		</section>
+	</div></div>
+  
+  <div class="slide" id="App_loop"><div>
+		<section>
+			<header>
+				<h2>Game loop (screen refresh)</h2>
+			</header>			        
+   			<pre>
+        <code>&lt;script type="text/javascript" src="webgl-utils.js"&gt;</code>
+        <code>&lt;/script&gt;</code>
+        </pre>
+        <pre>
+        <code>function gameLoop() {</code>
+        <code>    /* keyboard and mouse input, draw scene */ </code>        
+        <code>    <mark>requestAnimFrame</mark>(gameLoop);</code>
+        <code>}</code>
+        <code>function GameStart() {</code>        
+        <code>    <mark>gameLoop</mark>();</code>
+        <code>}</code>
+        </pre>
+		</section>
+	</div></div>
+
+  <div class="slide" id="keyboard_mouse_input"><div>
+		<section>
+			<header>
+				<h2>Keyboard &amp; Mouse input</h2>
+			</header>			        
+   			<pre>
+        <code>&lt;script type="text/javascript" src="webgl-utils.js"&gt;</code>
+        <code>&lt;/script&gt;</code>
+        </pre>
+        <pre>
+        <code>function gameLoop() {</code>
+        <code>    /* keyboard and mouse input, draw scene */ </code>        
+        <code>    <mark>requestAnimFrame</mark>(gameLoop);</code>
+        <code>}</code>
+        <code>function GameStart() {</code>        
+        <code>    <mark>gameLoop</mark>();</code>
+        <code>}</code>
+        </pre>
 		</section>
 	</div></div>
   
