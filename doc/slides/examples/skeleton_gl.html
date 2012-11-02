@@ -1,0 +1,13 @@
+<html>
+<script>
+  function GameStart() {
+    var canvas = document.getElementById("canvas_id");
+    gl = canvas.getContext("experimental-webgl");    
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+  }
+</script>
+<body onload="GameStart()">
+  <canvas id="canvas_id" width="500" height="500"></canvas>
+</body>
+</html>

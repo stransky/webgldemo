@@ -1,0 +1,12 @@
+<html>
+<script>
+  function GameStart() {
+    var canvas = document.getElementById("canvas_id");
+    context = canvas.getContext("2d");
+    context.fillRect(0, 0, canvas.width, canvas.height);
+  }
+</script>
+<body onload="GameStart()">
+  <canvas id="canvas_id" width="500" height="500"></canvas>
+</body>
+</html>
