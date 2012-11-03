@@ -395,7 +395,7 @@ function Material(structure) {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
             // How texture acts when being downscaled
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
             // Mipmap generation - diffent textures for different camera distance
             gl.generateMipmap(gl.TEXTURE_2D);

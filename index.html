@@ -43,7 +43,7 @@
     gl_Position = finalMatrix * vec4(aVertexPosition, 1.0);
     finalNormal = vec4(aVertexNormal, 0.0);
 
-    fTextureColor = dot(finalNormal, vec4(0.6,-0.6,0.6,0))+0.4;
+    fTextureColor = dot(finalNormal, vec4(0.6,-0.6,0.6,0));
     vTextureCoord = aTextureCoord;
   }
 </script>
@@ -61,10 +61,13 @@
   uniform sampler2D uTexture;
 
   vec4              vTextColor;
+  float             ambient = 0.3;
+  float             specular = 0.1;
 
   void main(void) {
       vTextColor = texture2D(uTexture, vec2(vTextureCoord.s, vTextureCoord.t));
-      gl_FragColor = vTextColor * vec4(fTextureColor, fTextureColor, fTextureColor, 1);
+      gl_FragColor = vTextColor * vec4(fTextureColor+ambient, fTextureColor+ambient, fTextureColor+ambient, 1)
+                     +vec4(fTextureColor*specular, fTextureColor*specular, fTextureColor*specular, 0);
   }
 </script>
 
@@ -118,9 +121,10 @@
   // Start!
   function DemoStart() {
     graphicsInit();
-    inputInit();    
-        
-    loadScene("levels/level11.json");
+    inputInit();
+
+//    loadScene("levels/level11.json");
+    loadScene("levels/level5.json");
     animationFrame();
   }
 
