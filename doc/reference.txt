@@ -6,30 +6,8 @@ http://www.khronos.org
 
 http://www.html5canvastutorials.com/advanced/html5-canvas-linear-motion-animation/
 
-// Rozdil oproti GL -> pouze vertex/fragment shaders 
-// Loading textur
-
-Images:
-WebGL
-    - rozdily mezi OpenGL -> ES
-    - vertex/pixel shader
-    - rendering
-
 - Demo -> 2d obrazek, mysi po obrazovce
-
 https://developer.mozilla.org/en-US/docs/JavaScript_typed_arrays/ArrayBufferView#Typed_array_subclasses
-
-Local storage
-
-Problemy specificke pro js:
-  - techniky ktere umozni JIT
-  - vyhnout se konverzi na double, nepouzivat eval&spol. a podobne
-  - Float32Array[] - velmi rychle
-
-Debugovani - Firebug:
-console.log()
-Profiler
-Breakpointy
 
 Zakonceni prednasky:
     - Co dal?
