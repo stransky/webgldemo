@@ -133,20 +133,20 @@ function createWebGLProgram() {
 function graphicsInit() {  
     var canvas = document.getElementById("webgl-canvas");
     try {
-      gl = canvas.getContext("experimental-webgl");              
-    } catch (e) {}      
+      gl = canvas.getContext("experimental-webgl");
+    } catch (e) {}
     if (!gl) {
       alert("Sorry kamo, ale chce to jinej prohlizec!");
     }
-    
+
     // Zakladni WebGL konfigurace
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.enable(gl.DEPTH_TEST);
-    
+
     // Nastav projekcni matici
     gl.viewport(0, 0, canvas.width, canvas.height);
     mat4.perspective(45, canvas.width / canvas.height, 1, 10000.0, graph.projectionMatrix);
-    
+
     // Zkompiluj shader program
     graph.shaderProgram = createWebGLProgram();  
 }
@@ -154,7 +154,7 @@ function graphicsInit() {
 // Calc final matrix (modelViewMatrix)
 function modelViewMatrixSet() {
   mat4.multiply(graph.cameraMatrix, graph.worldMatrix, graph.modelViewMatrix);
-}  
+}
 
 // Set matrices for shader program
 function setMatrixUniforms() {

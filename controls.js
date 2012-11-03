@@ -77,7 +77,6 @@ function handleKeyUp(event) {
 }
 
 // Vstup udalosti z mysi
-// Dokumentace k event je na:
 // https://developer.mozilla.org/en-US/docs/DOM/MouseEvent
 // event.screenX, event.screenY - globalni souradnice
 // event.clientX, event.clientY - lokalni souradnice (canvas)
@@ -116,4 +115,7 @@ function inputInit() {
   canvas.onmousedown = handleMouseButtonDown;
   document.onmouseup = handleMouseButtonUp;
   document.onmousemove = handleMouse;
+}
+
+function handleKeyboardInput() {
 }

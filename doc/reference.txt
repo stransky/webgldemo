@@ -1,42 +1,30 @@
-http://learningwebgl.com/blog/ - WebGl tutorialy (z Nehe)
 http://www.khronos.org/opengles/sdk/docs/reference_cards/OpenGL-ES-2_0-Reference-card.pdf - WebGL refenece card
 http://www.youtube.com/watch?v=huXucPChX3g - GDC 2012: Best practices in developing a web game 
 http://learningwebgl.com/cookbook/index.php/Main_Page - WebGl CookBook
 https://developer.mozilla.org/en-US/docs/WebGL/WebGL_best_practices - Hints
 http://www.khronos.org
 
-https://github.com/toji/gl-matrix
-
-http://browserquest.mozilla.org/ -> MMO
-http://play-ttd.com/play/
-
-Problemy (co se resi):
-- Cela aplikace je 1 html stranka - musime s tim pocitat
-  - AJAX - JSON data (loading)
-  - vstup od uzivatele (klavesnice/mys)
-- Data loading
-- Obrazky (grafika)
-
-- jak prepnout fo fullscreenu? (ale opravdoveho)
-
-2D animace -> casovac
 http://www.html5canvastutorials.com/advanced/html5-canvas-linear-motion-animation/
 
 // Rozdil oproti GL -> pouze vertex/fragment shaders 
 // Loading textur
 
+Images:
+WebGL
+    - rozdily mezi OpenGL -> ES
+    - vertex/pixel shader
+    - rendering
+
+- Demo -> 2d obrazek, mysi po obrazovce
+
 https://developer.mozilla.org/en-US/docs/JavaScript_typed_arrays/ArrayBufferView#Typed_array_subclasses
 
-Fullscreen API (ff9)
+Local storage
 
 Problemy specificke pro js:
   - techniky ktere umozni JIT
   - vyhnout se konverzi na double, nepouzivat eval&spol. a podobne
   - Float32Array[] - velmi rychle
-
-Bezne techniky:
-- da se ten canavas resizovat? (kdyz se me zmeni rozliseni obrazovky - fullscreen)
-- canvas 2D - jak se nahravaji obrazky, je tam "flip" cele obrazovky?
 
 Debugovani - Firebug:
 console.log()
@@ -47,4 +35,3 @@ Zakonceni prednasky:
     - Co dal?
     - bakalarky/diplomky
     - Mozilla market place
-

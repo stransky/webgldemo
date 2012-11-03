@@ -155,11 +155,11 @@
         <code>    <mark>context</mark> = canvas.getContext("<mark>2d</mark>");</code>
         <code>    context.<mark>fillRect</mark>(0, 0, canvas.width, canvas.height);</code>
         <code>}</code>
-        </pre>        
+        </pre>
         <a href="examples/skeleton.html" target="_blank">demo</a><br>
-        Specification:<br>
-        <a href="http://www.w3.org/TR/2010/WD-2dcontext-20100304/" target="_blank">
-                        http://www.w3.org/TR/2010/WD-2dcontext-20100304/</a>
+        Specification at <a href="http://www.w3.org/TR/2010/WD-2dcontext-20100304/" target="_blank">www.w3.org</a>
+        <br>
+        Tutorials at <a href="http://www.html5canvastutorials.com/" target="_blank">http://www.html5canvastutorials.com/</a>
 		</section>
 	</div></div>
 
@@ -175,11 +175,32 @@
         <code>    gl.clearColor(0.0, 0.0, 0.0, 1.0);</code>
         <code>    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);</code>
         <code>}</code>
-        </pre>        
+        </pre>
         <a href="examples/skeleton_gl.html" target="_blank">demo</a><br>
-        Specification:<br>
-        <a href="http://www.khronos.org/registry/webgl/specs/latest//" target="_blank">
-                 http://www.khronos.org/registry/webgl/specs/latest/</a>
+        Specification at <a href="http://www.khronos.org/registry/webgl/specs/latest/" target="_blank">
+        http://www.khronos.org</a><br>
+        Tutorials at <a href="http://learningwebgl.com/blog/?page_id=1217" target="_blank">
+        http://learningwebgl.com</a>
+		</section>
+	</div></div>
+  
+  <div class="slide" id="fullscreen_api"><div>
+		<section>
+			<header>
+				<h2>Fullscreen mode</h2>
+			</header>
+        <ul>
+        <li> F11 in Firefox (only canvas resize)</li>
+        <li> New Fullscreen API</li>
+        <ul>
+        <li>Specification at <a href="https://developer.mozilla.org/en-US/docs/DOM/Using_fullscreen_mode" target="_blank">
+        https://developer.mozilla.org</a>
+        </li>
+        <li><a href="https://developer.mozilla.org/samples/domref/fullscreen.html" target="_blank">demo</a>
+        </li>
+        </ul>
+        </li>
+        </ul>
 		</section>
 	</div></div>
   
@@ -189,7 +210,7 @@
 				<h2>Game loop (screen refresh)</h2>
 			</header>			        
    			<pre>
-        <code>&lt;script type="text/javascript" src="webgl-utils.js"&gt;</code>
+        <code>&lt;script type="text/javascript" src="<mark>webgl-utils.js</mark>"&gt;</code>
         <code>&lt;/script&gt;</code>
         </pre>
         <pre>
@@ -204,56 +225,131 @@
 		</section>
 	</div></div>
 
-  <div class="slide" id="keyboard_mouse_input"><div>
+  <div class="slide" id="keyboard_input"><div>
 		<section>
 			<header>
-				<h2>Keyboard &amp; Mouse input</h2>
-			</header>			        
-   			<pre>
-        <code>&lt;script type="text/javascript" src="webgl-utils.js"&gt;</code>
-        <code>&lt;/script&gt;</code>
-        </pre>
-        <pre>
-        <code>function gameLoop() {</code>
-        <code>    /* keyboard and mouse input, draw scene */ </code>        
-        <code>    <mark>requestAnimFrame</mark>(gameLoop);</code>
+				<h2>Keyboard input</h2>
+			</header>
+        <a href="https://developer.mozilla.org/en-US/docs/DOM/KeyboardEvent" target="_blank">
+           https://developer.mozilla.org/en-US/docs/DOM/KeyboardEvent</a>
+        <pre>        
+        <code>function handleKeyDown(<mark>event</mark>) {</code>
+        <code>    // <mark>event.keyCode</mark> contains KeyEvent.DOM_VK_*</code> 
         <code>}</code>
-        <code>function GameStart() {</code>        
-        <code>    <mark>gameLoop</mark>();</code>
+        <code>function handleKeyUp(<mark>event</mark>) {</code>
+        <code>    ...</code>
         <code>}</code>
+        <code>document.<mark>onkeydown</mark> = handleKeyDown;</code>
+        <code>document.<mark>onkeyup</mark> = handleKeyUp;</code>
         </pre>
 		</section>
 	</div></div>
   
-  <div class="slide" id="TwoLinesHeader"><div>
+  <div class="slide" id="mouse_input"><div>
 		<section>
 			<header>
-				<h2>Two rows.<br>Mighty heading</h2>
+				<h2>Mouse input</h2>
 			</header>
-			<p>This <code>&lt;tool&gt;</code> is provided <strong>without</strong> warranty, guarantee, or much in the way of explanation. Note that use of this tool may or may not crash <em>your</em> browser.</p>
+        <a href=" https://developer.mozilla.org/en-US/docs/DOM/MouseEvent" target="_blank">
+            https://developer.mozilla.org/en-US/docs/DOM/MouseEvent</a>
+        <pre>
+        <code>function handleMouse(event) {</code>
+        <code>    // event.<mark>screenX</mark>, event.<mark>screenY</mark> - global coordinates</code>
+        <code>    // event.<mark>clientX</mark>, event.<mark>clientY</mark> - local(canvas) coord.</code>
+        <code>    // event.<mark>buttons</mark> - 1|2|4|8...</code>
+        <code>}</code>
+        <code><mark>canvas</mark>.<mark>onmousedown</mark> = handleMouse;</code>
+        <code>document.<mark>onmouseup</mark> = handleMouse;</code>
+        <code>document.<mark>onmousemove</mark> = handleMouse;</code>
+        </pre>
 		</section>
 	</div></div>
 
-	<div class="slide" id="UnorderedList"><div>
+  <div class="slide" id="data_loading_json"><div>
 		<section>
 			<header>
-				<h2>Unordered List</h2>
+				<h2>Data format - JSON files</h2>
+			</header>                
+        <ul>        
+        <li>Plain text format, JS syntax <a href="http://www.json.org/" target="_blank">http://www.json.org/</a></li>
+        <li>Built in JSON object in JS</li>
+        <li>Not compressed by default</li>
+        <li>HTTP gzip compression on web server<br>(Content-Encoding: gzip)</li>
+        </ul>
+        
+        <pre>
+        <code>var json_text_data = <mark>"[1, 5, 10]"</mark>;</code>
+        <code>obj = <mark>JSON.parse</mark>(json_text_data);</code>
+        <code>/* obj is an array with 1,5,10 elements now */</code>        
+        <pre>
+		</section>
+	</div></div>
+  
+  <div class="slide" id="data_loading_ajax"><div>
+		<section>
+			<header>
+				<h2>Data loading - AJAX</h2>
+			</header>
+        When HTML page is loaded, usually async. (non blocking)<br>
+        <pre>
+        <code>var request = new <mark>XMLHttpRequest()</mark>;</code>
+        <code>request.<mark>open</mark>("GET", "my_data_file.json");</code>
+        <code>request.<mark>onreadystatechange</mark> = function() {</code>
+        <code>    if (request.readyState == 4) { // 'DONE'</code>
+        <code>        var obj = JSON.parse(<mark>request.responseText</mark>);</code>
+        <code>    }</code>
+        <code>}</code>
+        <code><mark>request.send()</mark>;</code>
+        </pre>
+		</section>
+	</div></div>
+  
+  <div class="slide" id="images_loading"><div>
+		<section>
+			<header>
+				<h2>Image &amp; Texture loading</h2>
+			</header>        
+        <pre>
+        <code>var image = new <mark>Image()</mark>;</code>
+        <code>image.<mark>onload</mark> = function () {</code>
+        <code>    var <mark>texture</mark> = gl.createTexture();</code>
+        <code>    gl.bindTexture(gl.TEXTURE_2D, <mark>texture</mark>);</code>
+        <code>    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,</code>
+        <code>                  gl.UNSIGNED_BYTE, <mark>image</mark>);</code>
+        <code>}</code>
+        <code>// Set this <b>after</b> image.onload() definition</code>
+        <code>image.src = <mark>"image_file.jpg"</mark>;</code>
+        </pre>
+		</section>
+	</div></div>
+    
+  <div class="slide" id="webgl_difference"><div>
+		<section>
+			<header>
+				<h2>WebGL - OpenGL ES web interface</h2>
 			</header>
 			<ul>
-				<li>This tool is provided</li>
-				<li>Without warranty, guarantee</li>
-				<li>Or much in the way of explanation
-					<ol>
-						<li>Note that use of this tool</li>
-						<li>May or may not crash your browser</li>
-						<li>Lock up your machine</li>
-					</ol>
-				</li>
-				<li>Erase your hard drive.</li>
-			</ul>
+        <li>Based on OpenGL ES 2.0</li>
+				<li>PC, Android, iPad/iPhone, even Windows can run it</li>
+        <li>A lightweight OpenGL version</li>
+        <ul>
+          <li>Removed fixed rendering pipeline, only shaders</li>
+          <li>Vertex buffers only (without glBegin() &amp; glEnd())</li>
+        </ul>
+			</ul>      
 		</section>
 	</div></div>
-
+  
+  <div class="slide" id="webgl_shaders"><div>
+		<section>
+			<header>
+				<h2>WebGL - Shaders</h2>
+			</header>
+      <pre>
+      <code>Raw 3D data -> vertex shader -> pixel shader -> screen</code>
+      </pre>
+		</section>
+	</div></div>
 
 	<div class="slide" id="OrderedList"><div>
 		<section>
