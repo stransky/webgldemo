@@ -36,14 +36,14 @@
 
   mat4 finalMatrix;
   vec4 finalNormal;
-    
+
   void main(void) {
     finalMatrix = uPMatrix * uMVMatrix;
-    
+
     gl_Position = finalMatrix * vec4(aVertexPosition, 1.0);
     finalNormal = vec4(aVertexNormal, 0.0);
-    
-    fTextureColor = dot(finalNormal, vec4(0.6,-0.6,0.6,0));
+
+    fTextureColor = dot(finalNormal, vec4(0.6,-0.6,0.6,0))+0.4;
     vTextureCoord = aTextureCoord;
   }
 </script>
@@ -52,19 +52,19 @@
   /* OpenGL ES's shading language - Pixel (Fragment) shader
   */
   precision mediump float;
-  
+
   // varying - interpolovana hodnota z vertex shaderu
   varying vec2      vTextureCoord;
   varying float     fTextureColor;
-  
+
   // konstanta - zde pro pouzitou texturu
   uniform sampler2D uTexture;
-  
+
   vec4              vTextColor;
-  
+
   void main(void) {
-      vTextColor = texture2D(uTexture, vec2(vTextureCoord.s, vTextureCoord.t));      
-      gl_FragColor = vTextColor * vec4(fTextureColor, fTextureColor, fTextureColor, 1);      
+      vTextColor = texture2D(uTexture, vec2(vTextureCoord.s, vTextureCoord.t));
+      gl_FragColor = vTextColor * vec4(fTextureColor, fTextureColor, fTextureColor, 1);
   }
 </script>
 
@@ -119,10 +119,8 @@
   function DemoStart() {
     graphicsInit();
     inputInit();    
-    
-    loadTexture("test.jpg", 0);
-    loadScene("levels/level28.json");
-
+        
+    loadScene("levels/level11.json");
     animationFrame();
   }
 
