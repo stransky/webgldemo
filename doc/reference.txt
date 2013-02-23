@@ -1,3 +1,4 @@
+https://github.com/kripken/emscripten/wiki
 http://www.khronos.org/opengles/sdk/docs/reference_cards/OpenGL-ES-2_0-Reference-card.pdf - WebGL refenece card
 http://www.youtube.com/watch?v=huXucPChX3g - GDC 2012: Best practices in developing a web game 
 http://learningwebgl.com/cookbook/index.php/Main_Page - WebGl CookBook
@@ -8,8 +9,3 @@ http://www.html5canvastutorials.com/advanced/html5-canvas-linear-motion-animatio
 
 - Demo -> 2d obrazek, mysi po obrazovce
 https://developer.mozilla.org/en-US/docs/JavaScript_typed_arrays/ArrayBufferView#Typed_array_subclasses
-
-Zakonceni prednasky:
-    - Co dal?
-    - bakalarky/diplomky
-    - Mozilla market place

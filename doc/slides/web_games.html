@@ -116,10 +116,43 @@
 			</header>
         <ul>
           <li><a href="https://github.com/kripken/emscripten/wiki" target="_blank">Emscripten</a> (LLVM-to-JS compiler)</li>
+          <li><a href="https://github.com/kripken/emscripten/wiki/Tutorial" target="_blank">Emscripten Tutorial</a></li>
           <li>SDL/WebGL to &lt;canvas&gt; wrapper</li>
           <li>~10x slower than gcc -O3</li>
           <li><a href="https://developer.mozilla.org/en-US/demos/detail/bananabread/launch" target="_blank">BananaBread (Cube 2: Sauerbraten port)</a></li>
           <li><a href="http://play-ttd.com/play/" target="_blank">OpenTycoon</a></li>
+        </ul>
+		</section>
+	</div></div>
+  
+  <div class="slide" id="Converted_apps_2"><div>
+		<section>
+			<header>
+				<h2>C/C++ conversion on Fedora 18</h2>
+			</header>
+        <pre>
+          <code>#yum install <mark>clang</mark></code>
+          <code>git clone git://github.com/kripken/<mark>emscripten</mark>.git</code>
+          <code>Download <mark>node.js</mark> from http://nodejs.org/download/, unpack</code>
+          <code>$export <mark>NODE</mark>=path_to_node_binary;</code>
+          <code>$export <mark>PATH</mark>=$PATH:path_to_emscripten_dir</code>
+          <code>$<mark>emcc</mark> test.cpp -o hello.html</code>
+          <code> </code>
+          <code>$<mark>emconfigure</mark> ./configure; <mark>emmake</mark> make;</code>
+          <code>$emcc binary -o game.html</code>
+        </pre>
+		</section>
+	</div></div>
+  
+  <div class="slide" id="Converted_apps_3"><div>
+		<section>
+			<header>
+				<h2>C/C++ conversion issues</h2>
+			</header>
+        <ul>
+          <li>Virtual filesystem (local vs. web server) or --preload-file</li>
+          <li>Libraries - only SDL, OpenGL ES, libc by default</li>
+          <li>Development/Debugging - emcc generated a chaotic JS code</li>
         </ul>
 		</section>
 	</div></div>
